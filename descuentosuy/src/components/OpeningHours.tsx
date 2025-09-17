@@ -30,8 +30,9 @@ export function OpeningHours({ openingHours }: Props) {
     return null;
   }
 
-  const todayIndex = new Date().getDay();
-  
+  const jsDay = new Date().getDay();
+  const todayIndex = jsDay === 0 ? 6 : jsDay - 1;
+
   const todaysHoursText = openingHours.weekday_text[todayIndex] || '';
   const todaysHours = todaysHoursText.substring(todaysHoursText.indexOf(':') + 1).trim();
 
@@ -59,7 +60,9 @@ export function OpeningHours({ openingHours }: Props) {
           {statusText}
         </span>
         <span className="ml-2 text-gray-600">{todaysHours.replace('Closed', 'Cerrado')}</span>
-        <span className="ml-2 text-gray-400 transform transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}">▼</span>
+        <span className={`ml-2 text-gray-400 transform transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
+          ▼
+        </span>
       </div>
 
       {isOpen && (
