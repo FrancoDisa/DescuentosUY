@@ -1,7 +1,8 @@
 
 'use client';
 
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { useSearchParams } from 'next/navigation';
 import 'leaflet/dist/leaflet.css';
 
@@ -24,22 +25,41 @@ type MapProps = {
 
 const defaultPosition: [number, number] = [-34.9011, -56.1645]; // Montevideo
 
+type RecenterOnUserProps = {
+  userLat: number | null;
+  userLon: number | null;
+};
+
+function RecenterOnUser({ userLat, userLon }: RecenterOnUserProps) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (userLat !== null && userLon !== null) {
+      map.setView([userLat, userLon]);
+    }
+  }, [map, userLat, userLon]);
+
+  return null;
+}
+
 export function Map({ stores }: MapProps) {
   const searchParams = useSearchParams();
   const userLat = searchParams.get('lat') ? parseFloat(searchParams.get('lat')!) : null;
   const userLon = searchParams.get('lon') ? parseFloat(searchParams.get('lon')!) : null;
 
-  const mapCenter: [number, number] = userLat && userLon ? [userLat, userLon] : defaultPosition;
+  const mapCenter: [number, number] =
+    userLat !== null && userLon !== null ? [userLat, userLon] : defaultPosition;
 
   return (
     <MapContainer center={mapCenter} zoom={14} style={{ height: '500px', width: '100%', borderRadius: '8px' }}>
+      <RecenterOnUser userLat={userLat} userLon={userLon} />
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
       
       {/* Marcador para la ubicación del usuario */}
-      {userLat && userLon && (
+      {userLat !== null && userLon !== null && (
         <Marker position={[userLat, userLon]}>
           <Popup>Tu ubicación</Popup>
         </Marker>
