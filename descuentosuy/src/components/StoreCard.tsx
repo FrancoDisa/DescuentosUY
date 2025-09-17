@@ -23,10 +23,34 @@ export type Store = {
   distance_km?: number; // Añadimos la distancia como opcional
 };
 
+export type UserLocation = {
+  lat?: string;
+  lon?: string;
+};
+
+type StoreCardProps = {
+  store: Store;
+  userLocation?: UserLocation;
+};
+
 // El componente de la tarjeta para un solo local, ahora envuelto en un Link
-export function StoreCard({ store }: { store: Store }) {
+export function StoreCard({ store, userLocation }: StoreCardProps) {
+  const queryParams = new URLSearchParams();
+
+  if (userLocation?.lat) {
+    queryParams.set('lat', userLocation.lat);
+  }
+
+  if (userLocation?.lon) {
+    queryParams.set('lon', userLocation.lon);
+  }
+
+  const href = queryParams.size > 0
+    ? `/local/${store.id}?${queryParams.toString()}`
+    : `/local/${store.id}`;
+
   return (
-    <Link href={`/local/${store.id}`} className="block h-full">
+    <Link href={href} className="block h-full">
       <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105 flex flex-col h-full">
         {/* Logo del Local */}
         <div className="relative h-40 bg-gray-200 flex items-center justify-center">

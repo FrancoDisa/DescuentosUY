@@ -1,13 +1,14 @@
-import { StoreCard, type Store } from "@/components/StoreCard";
+import { StoreCard, type Store, type UserLocation } from "@/components/StoreCard";
 
 // Se define un tipo para las props, que ahora incluye la lista de locales.
 type StoreListProps = {
   stores: Store[];
   query?: string;
+  userLocation?: UserLocation;
 };
 
 // El componente ya no es asíncrono. Es un componente de presentación simple.
-export function StoreList({ stores, query }: StoreListProps) {
+export function StoreList({ stores, query, userLocation }: StoreListProps) {
   // La lógica de error y de "no resultados" ahora se maneja aquí,
   // basándose en los datos que se le pasan.
   if (!stores) {
@@ -28,7 +29,7 @@ export function StoreList({ stores, query }: StoreListProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
       {stores.map((store) => (
-        <StoreCard key={store.branch_id} store={store} />
+        <StoreCard key={store.branch_id} store={store} userLocation={userLocation} />
       ))}
     </div>
   );

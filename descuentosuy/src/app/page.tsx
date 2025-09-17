@@ -33,19 +33,23 @@ type PageProps = {
 export default async function Home({ searchParams }: PageProps) {
   const { query, sort, lat, lon } = searchParams;
 
+  const userLocation = lat || lon ? { lat, lon } : undefined;
+
   const supabase = createPublicClient();
 
   // 1. Obtenemos la lista de SUCURSALES
-  const { data: branches, error } = await supabase.rpc('search_stores', {
+  const { data, error } = await supabase.rpc<Branch[]>('search_stores', {
     search_term: query || '',
     sort_option: sort || 'default',
     user_lat: lat ? parseFloat(lat) : null,
     user_lon: lon ? parseFloat(lon) : null,
-  }) as { data: Branch[], error: any };
+  });
 
   if (error) {
     return <p className="p-8 text-center text-red-500">Error al cargar los datos: {error.message}</p>;
   }
+
+  const branches = data ?? [];
 
   // 2. Creamos una lista de LOCALES únicos para la vista de tarjetas
   const uniqueStoresMap = new Map<string, Store>();
@@ -111,7 +115,7 @@ export default async function Home({ searchParams }: PageProps) {
       <main className="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
         <Suspense fallback={<div className="text-center col-span-full"><p>Cargando locales...</p></div>}>
           {/* 4. Pasamos la lista de locales ÚNICOS a la lista de tarjetas */}
-          <StoreList stores={uniqueStores} query={query} />
+          <StoreList stores={uniqueStores} query={query} userLocation={userLocation} />
         </Suspense>
       </main>
     </div>
