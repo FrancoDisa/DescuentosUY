@@ -144,13 +144,14 @@ export function StoreDetail({ store }: { store: Store }) {
                       <span className="font-semibold">Tel:</span> {branch.branch_details.phone_number}
                     </a>
                   )}
-                  {branch.branch_details?.rating && (
-                    <div className="flex items-center mt-2 text-sm">
-                      <span className="text-yellow-500">★</span>
-                      <span className="ml-1 font-bold">{branch.branch_details.rating}</span>
-                      <span className="ml-1 text-gray-500">({branch.branch_details.user_ratings_total} reseñas)</span>
-                    </div>
-                  )}
+                  {branch.branch_details?.rating !== null &&
+                    branch.branch_details?.rating !== undefined && (
+                      <div className="flex items-center mt-2 text-sm">
+                        <span className="text-yellow-500">★</span>
+                        <span className="ml-1 font-bold">{branch.branch_details.rating}</span>
+                        <span className="ml-1 text-gray-500">({branch.branch_details.user_ratings_total} reseñas)</span>
+                      </div>
+                    )}
                   <OpeningHours openingHours={branch.branch_details?.opening_hours} />
                 </div>
               ))
