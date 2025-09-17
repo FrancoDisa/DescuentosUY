@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Image from 'next/image'; // Importar Image
 import { createClient } from '@/utils/supabase/client';
 
@@ -10,7 +10,7 @@ type Branch = { id: string; name: string; address: string; };
 type Promotion = { id: string; name: string; value: number; card_issuer: string; card_type: string; card_tier: string; description: string; };
 
 export default function AdminPage() {
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   // --- Listas de Datos ---
   const [stores, setStores] = useState<Store[]>([]);
