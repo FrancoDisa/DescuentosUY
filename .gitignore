@@ -1,0 +1,46 @@
+# Node / Next.js
+node_modules/
+.next/
+.out/
+.vercel/
+.next-cache/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# Editor config
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS / Misc
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Coverage / tests
+coverage/
+.nyc_output/
+
+# Typescript
+*.tsbuildinfo
+
+# Local data
+**/supabase/.temp/
+**/.cache/
+
+# Dist outputs
+build/
+dist/
+
+# CSV/exports (keep if needed; comment out to include)
+# *.csv
