@@ -55,8 +55,14 @@ export default async function Home({ searchParams }: PageProps) {
   const uniqueStoresMap = new Map<string, Store>();
   for (const branch of branches) {
     const existing = uniqueStoresMap.get(branch.store_id);
-    // Si no hemos visto este local, o si esta sucursal está más cerca que la guardada, la reemplazamos.
-    if (!existing || (branch.distance_km != null && existing.distance_km != null && branch.distance_km < existing.distance_km)) {
+    const branchDistance = branch.distance_km;
+    const existingDistance = existing?.distance_km;
+    // Si no hemos visto este local o la nueva sucursal tiene una distancia válida que mejora a la existente, la reemplazamos.
+    if (
+      !existing ||
+      (branchDistance != null && existingDistance == null) ||
+      (branchDistance != null && existingDistance != null && branchDistance < existingDistance)
+    ) {
       uniqueStoresMap.set(branch.store_id, {
         id: branch.store_id,
         branch_id: branch.branch_id,
