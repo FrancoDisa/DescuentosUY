@@ -20,7 +20,7 @@ Este enfoque es altamente escalable, rápido y seguro.
 *   **Práctica Clave: App Router.** Usaremos el nuevo "App Router" de Next.js en lugar del antiguo "Pages Router". Esto nos permite aprovechar las últimas características de React y Next.js.
 *   **Componentes de Servidor vs. Cliente:**
     *   **Server Components (por defecto):** La mayoría de los componentes que solo muestran datos (listas, detalles) serán Componentes de Servidor. Ej: `app/local/[id]/page.tsx` (que ahora carga los datos para `StoreDetail`).
-    *   **Client Components (cuando sea necesario):** Componentes que requieren interactividad del usuario (como el mapa interactivo, la obtención de geolocalización o el ordenamiento interactivo de sucursales) se marcarán explícitamente como Componentes de Cliente. Ej: `<LocationHandler>`, `<StoreDetail>`.
+    *   **Client Components (cuando sea necesario):** Componentes que requieren interactividad del usuario (como el mapa interactivo, la obtención de geolocalización o el ordenamiento interactivo de sucursales) se marcan explícitamente como Componentes de Cliente. Ej: `<LocationHandler>`, `<LocationStatus>`, `<Map>` y `<StoreDetail>`.
 *   **Estilos:** Tailwind CSS.
 *   **Gestión de Estado:** Para estados simples, usaremos los hooks de React.
 
@@ -33,9 +33,10 @@ Este enfoque es altamente escalable, rápido y seguro.
 *   **Integración:** Usaremos la librería oficial `@supabase/ssr` para una integración segura y eficiente con el App Router de Next.js.
 *   **Servicios a Utilizar:**
     *   **Base de Datos PostgreSQL:** Para almacenar todos los datos de la aplicación.
-    *   **Extensión PostGIS:** Para realizar cálculos geoespaciales eficientes.
-    *   **API Automática y Funciones RPC:** Para todas las operaciones de lectura y lógicas de negocio complejas.
-    *   **Autenticación:** Para la futura gestión de usuarios.
+*   **Extensión PostGIS:** Para realizar cálculos geoespaciales eficientes.
+*   **API Automática y Funciones RPC:** Para todas las operaciones de lectura y lógicas de negocio complejas.
+*   **Autenticación:** Para la futura gestión de usuarios.
+*   **Almacenamiento de Estado de Ubicación:** Se persiste un resumen del último geo fix (coordenadas, precisión, origen `gps/manual`) en `sessionStorage` mediante `src/utils/locationStorage.ts`.
 
 ----------
 2.3. SERVICIOS EXTERNOS
@@ -90,8 +91,8 @@ Se utiliza un patrón basado en **React Suspense** para una carga de datos fluid
 Para mostrar al usuario la distancia a la sucursal más cercana, se implementó el siguiente flujo:
 
 *   **1. Geolocalización en el Cliente:**
-    *   Un componente de cliente (`<LocationHandler>`) utiliza la API del navegador `navigator.geolocation` para obtener las coordenadas del usuario.
-    *   Una vez obtenidas, redirige la página, añadiendo las coordenadas `lat` y `lon` como parámetros a la URL.
+    *   `<LocationHandler>` solicita la geolocalización con `enableHighAccuracy`, arranca un `watchPosition` temporal para obtener la mejor precisión disponible y actualiza los parámetros `lat` y `lon` de la URL.
+    *   La información se guarda en `sessionStorage` (precisión estimada, momento de captura y fuente `gps`).
 
 *   **2. Petición de Datos al Servidor:**
     *   El componente de servidor (`<StoreList>`) lee los parámetros `lat` y `lon` de la URL.
@@ -103,4 +104,12 @@ Para mostrar al usuario la distancia a la sucursal más cercana, se implementó 
     *   La función `search_stores` fue modificada para llamar a esta función helper por cada local, devolviendo la distancia a la sucursal más cercana en kilómetros.
 
 *   **4. Visualización en la UI:**
-    *   El componente `<StoreCard>` recibe la distancia y la muestra al usuario.
+    *   `<StoreCard>` y el popup del `<Map>` muestran la distancia aproximada, el mejor porcentaje disponible y enlaces directos.
+
+----------
+2.9. EXPERIENCIA EN EL MAPA
+----------
+
+*   **Tarjetas emergentes:** Cada pin expone una tarjeta compacta con logo, dirección, promoción destacada, contador de beneficios adicionales y botones para ver la ficha completa o abrir Google Maps (`travelmode=walking`).
+*   **Estado de ubicación:** `<LocationStatus>` fija un panel discreto en la esquina del mapa indicando precisión y momento del último fix; permite ajustar con dirección postal (geocodificada con Google Maps Geocoding API) o ingresar coordenadas manuales.
+*   **Enfoque automático:** El mapa centra/escala la vista usando todos los puntos disponibles (usuario + sucursales visibles) gracias a `fitBounds` y padding.

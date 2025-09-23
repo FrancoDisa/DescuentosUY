@@ -5,10 +5,6 @@ import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { notFound } from 'next/navigation';
 
-type PageProps = {
-  params: { id: string };
-};
-
 // La página es ahora el Server Component que se encarga de buscar los datos
 async function StoreDataFetcher({ storeId }: { storeId: string }) {
   const cookieStore = cookies();
@@ -32,8 +28,8 @@ async function StoreDataFetcher({ storeId }: { storeId: string }) {
   return <StoreDetail store={store as unknown as Store} />;
 }
 
-export default function StoreDetailPage({ params }: PageProps) {
-  const storeId = params.id;
+export default async function StoreDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id: storeId } = await params;
   
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -42,7 +38,6 @@ export default function StoreDetailPage({ params }: PageProps) {
           <Link href="/?" className="text-purple-600 hover:text-purple-800 mb-4 block">&larr; Volver a todos los locales</Link>
           
           <Suspense fallback={<div className="h-24"><p className="text-lg">Cargando detalles del local...</p></div>}>
-            {/* @ts-expect-error Server Component */}
             <StoreDataFetcher storeId={storeId} />
           </Suspense>
         </div>

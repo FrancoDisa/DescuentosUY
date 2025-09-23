@@ -1,9 +1,6 @@
-import Image from 'next/image';
+﻿import Image from 'next/image';
 import Link from 'next/link';
 
-// src/components/StoreCard.tsx
-
-// Tipos simplificados solo para lo que la tarjeta necesita
 export type Promotion = {
   id: string;
   name: string;
@@ -16,11 +13,11 @@ export type Promotion = {
 
 export type Store = {
   id: string;
-  branch_id: string; // ID único de la sucursal
+  branch_id: string;
   name: string;
   logo_url: string | null;
   promotions: Promotion[];
-  distance_km?: number; // Añadimos la distancia como opcional
+  distance_km?: number;
 };
 
 export type UserLocation = {
@@ -33,7 +30,6 @@ type StoreCardProps = {
   userLocation?: UserLocation;
 };
 
-// El componente de la tarjeta para un solo local, ahora envuelto en un Link
 export function StoreCard({ store, userLocation }: StoreCardProps) {
   const queryParams = new URLSearchParams();
 
@@ -45,56 +41,98 @@ export function StoreCard({ store, userLocation }: StoreCardProps) {
     queryParams.set('lon', userLocation.lon);
   }
 
-  const href = queryParams.size > 0
-    ? `/local/${store.id}?${queryParams.toString()}`
-    : `/local/${store.id}`;
+  const href = queryParams.size > 0 ? `/local/${store.id}?${queryParams.toString()}` : `/local/${store.id}`;
+  const topPromotion = store.promotions?.[0];
+  const extraPromotions = store.promotions?.slice(1) ?? [];
+  const promoValueLabel = typeof topPromotion?.value === 'number' ? `${Math.round(topPromotion.value)}% OFF` : null;
+  const promoMeta = topPromotion ? [topPromotion.card_type, topPromotion.card_tier].filter(Boolean).join(' / ') : '';
 
   return (
     <Link href={href} className="block h-full">
-      <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105 flex flex-col h-full">
-        {/* Logo del Local */}
-        <div className="relative h-40 bg-gray-200 flex items-center justify-center">
-          {store.logo_url ? (
-            <Image 
-              src={store.logo_url} 
-              alt={`${store.name} logo`} 
-              fill={true}
-              style={{ objectFit: 'contain' }}
-              className="p-4"
-            />
-          ) : (
-            <span className="text-gray-500">Logo no disponible</span>
-          )}
+      <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
+        <div className="relative bg-gradient-to-r from-purple-100 via-purple-50 to-pink-50 p-6">
+          <div className="flex items-center gap-4">
+            <div className="relative h-16 w-16 overflow-hidden rounded-2xl border border-white/70 bg-white shadow-inner">
+              {store.logo_url ? (
+                <Image
+                  src={store.logo_url}
+                  alt={`${store.name} logo`}
+                  fill
+                  sizes="64px"
+                  className="object-contain p-2"
+                />
+              ) : (
+                <span className="flex h-full items-center justify-center text-xs font-semibold text-gray-400">
+                  Sin logo
+                </span>
+              )}
+            </div>
+            <div className="flex flex-1 flex-col gap-2">
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="text-lg font-semibold text-gray-900">{store.name}</h3>
+                {store.distance_km != null && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-purple-600/10 px-3 py-1 text-xs font-semibold text-purple-700">
+                    <svg aria-hidden xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                    </svg>
+                    {store.distance_km.toFixed(1)} km
+                  </span>
+                )}
+              </div>
+              {topPromotion?.card_issuer && (
+                <p className="text-xs uppercase tracking-wide text-purple-600">{topPromotion.card_issuer}</p>
+              )}
+            </div>
+          </div>
         </div>
 
-        <div className="p-6 flex-grow flex flex-col">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">{store.name}</h2>
-
-          {/* Mostramos la distancia si está disponible */}
-          {store.distance_km != null && (
-            <div className="flex items-center text-gray-600 mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-              </svg>
-              <span>Aprox. a {store.distance_km.toFixed(1)} km</span>
+        <div className="flex flex-1 flex-col gap-4 p-6">
+          {topPromotion ? (
+            <div className="rounded-2xl border border-purple-100 bg-purple-50/80 p-4">
+              <div className="flex items-baseline gap-3">
+                {promoValueLabel && <span className="text-3xl font-black text-purple-700">{promoValueLabel}</span>}
+                <p className="text-sm font-semibold text-gray-900">{topPromotion.name}</p>
+              </div>
+              {promoMeta && <p className="mt-2 text-xs text-gray-600">{promoMeta}</p>}
+              {topPromotion.description && (
+                <p className="mt-2 text-xs leading-relaxed text-gray-500">{topPromotion.description}</p>
+              )}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-gray-200 p-4 text-sm text-gray-500">
+              Estamos cargando promociones para este local.
             </div>
           )}
 
-          <div className="space-y-3 flex-grow">
-            {store.promotions && store.promotions.length > 0 ? (
-              store.promotions.map((promo) => (
-                <div key={promo.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <p className="font-bold text-lg text-purple-600">{promo.value}% <span className="text-gray-700 font-semibold">{promo.name}</span></p>
-                  <p className="text-sm text-gray-600 mt-1"><strong>Emisor:</strong> {promo.card_issuer}</p>
-                  <p className="text-sm text-gray-600"><strong>Tarjetas:</strong> {promo.card_tier}</p>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-gray-500">No hay promociones asignadas a este local.</p>
-            )}
-          </div>
+          {extraPromotions.length > 0 && (
+            <div className="space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                {extraPromotions.length} beneficio{extraPromotions.length > 1 ? 's' : ''} adicional{extraPromotions.length > 1 ? 'es' : ''}
+              </p>
+              <ul className="space-y-2 text-xs text-gray-600">
+                {extraPromotions.slice(0, 3).map((promo) => {
+                  const extraMeta = [promo.card_type, promo.card_tier].filter(Boolean).join(' / ');
+                  return (
+                    <li key={promo.id} className="rounded-xl border border-gray-100 bg-gray-50 px-3 py-2">
+                      <span className="font-semibold text-gray-900">{Math.round(promo.value)}% </span>
+                      {promo.name}
+                      {extraMeta ? ` / ${extraMeta}` : ''}
+                    </li>
+                  );
+                })}
+                {extraPromotions.length > 3 && (
+                  <li className="text-xs text-gray-400">y {extraPromotions.length - 3} promos mas...</li>
+                )}
+              </ul>
+            </div>
+          )}
         </div>
-      </div>
+        <footer className="flex items-center justify-between border-t border-gray-100 bg-gray-50 px-6 py-4 text-sm font-semibold text-purple-700 transition group-hover:bg-purple-50">
+          Ver detalles del local
+          <span aria-hidden className="text-lg">&rarr;</span>
+        </footer>
+      </article>
     </Link>
   );
 }
+
