@@ -152,7 +152,7 @@ export function StoreDetail({ store }: { store: Store }) {
                         <span className="ml-1 text-gray-500">({branch.branch_details.user_ratings_total} reseñas)</span>
                       </div>
                     )}
-                  <OpeningHours openingHours={branch.branch_details?.opening_hours} />
+                  <OpeningHours openingHours={branch.branch_details?.opening_hours ?? null} />
                 </div>
               ))
             ) : (

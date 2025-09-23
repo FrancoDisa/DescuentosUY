@@ -31,11 +31,14 @@ ROADMAP DEL PROYECTO: DescuentosUY
 - **Tarea: Cálculo y Visualización de Distancia.**
   - **Descripción:** Se implementó la geolocalización del usuario en el navegador. Usando funciones de PostgreSQL, la aplicación ahora calcula y muestra la distancia a la sucursal más cercana para cada local. La página principal permite ordenar por cercanía, y la página de detalle permite ordenar las sucursales por **cercanía o por rating**.
 
-- **Tarea (Próxima): Implementar la Vista de Mapa.**
-  - **Descripción:** Crear una vista que muestre todos los locales como pines en un mapa. Al hacer clic en un pin, se mostrará la "Ficha de Detalle".
+- **Tarea: Vista de Mapa Interactiva.** ✅
+  - **Descripción:** El mapa en la página principal (Leaflet) muestra pines diferenciados, tarjetas emergentes con promociones y acciones rápidas para cada sucursal.
 
-- **Tarea (Próxima): Integrar Navegación "Cómo Ir".**
-  - **Descripción:** Añadir el botón para abrir la ruta en Google Maps dentro de la "Ficha de Detalle".
+- **Tarea: Integrar Navegación "Cómo Ir".** ✅
+  - **Descripción:** Desde cada popup se puede abrir Google Maps con origen/destino prellenados.
+
+- **Tarea: Ajuste Manual de Ubicación.** ✅
+  - **Descripción:** Se añadió un overlay que informa precisión y permite refinar la ubicación con direcciones o coordenadas manuales.
 
 ==================================================
 ÉPICA 3: PERSONALIZACIÓN Y COMUNIDAD

@@ -79,8 +79,7 @@ export async function GET() {
 
   // 3. Iterar y actualizar cada sucursal, aplicando la lógica de caché
   for (const branch of branches) {
-    // @ts-expect-error - Supabase types might not be perfect for nested selects
-    const details = branch.branch_details;
+    const details = (branch as { branch_details?: { updated_at?: string } }).branch_details;
 
     // Si hay detalles y fueron actualizados hace menos de 3 meses, saltar
     if (details && details.updated_at && new Date(details.updated_at) > threeMonthsAgo) {

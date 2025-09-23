@@ -5,11 +5,15 @@ Un mapa para no perderte ningún descuento en Montevideo y para encontrar el mej
 ## Características Implementadas
 
 *   **Búsqueda y Ordenamiento en el Servidor:** Búsqueda de texto completo contra locales y promociones. Los resultados se pueden ordenar por relevancia, por mayor descuento o por **cercanía a tu ubicación**.
-*   **Cálculo de Distancia:** La aplicación solicita tu ubicación para calcular y mostrar la distancia aproximada a la sucursal más cercana de cada local, y permite ordenar las sucursales por **cercanía o por rating**.
+*   **Mapa Interactivo:** El mapa principal muestra pines diferenciados para tu posición y cada sucursal, con tarjetas emergentes que resumen logo, dirección, promociones destacadas y accesos directos a "Ver detalles" y "Cómo llegar" en Google Maps.
+*   **Vista dedicada `/mapa`:** Explora el mapa en pantalla completa conservando búsqueda, orden y coordenadas desde la vista principal.
+*   **Geolocalización Ajustable:** La aplicación solicita tu ubicación, guarda la precisión estimada y permite refinarla con direcciones reales (ej: *Charrúa 2515*); la distancia aproximada a cada sucursal se recalcula al vuelo, y las sucursales pueden ordenarse por **cercanía o por rating**.
+*   **Geocodificación con Google:** El modal "Ajustar" transforma direcciones en coordenadas mediante la Google Geocoding API y reutiliza `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`; habilita la API de Geocoding en tu proyecto de Google Cloud.
 *   **Ficha de Detalle Completa:** Al seleccionar un local, se obtiene información detallada, incluyendo datos sincronizados desde Google Places como teléfono (**ahora clickeable**), sitio web y rating. Los **horarios de apertura son interactivos** y muestran el estado actual.
 *   **Panel de Administración:** Una ruta protegida (`/admin/cargar`) permite la gestión (CRUD) de locales, sucursales y promociones.
 *   **Base de Datos Robusta:** La arquitectura de datos está normalizada en Supabase (PostgreSQL) para soportar relaciones complejas y escalabilidad.
 *   **Gestión de Logos:** Los logos de los locales se gestionan y sirven desde Supabase Storage para mayor fiabilidad.
+*   **Promociones Enriquecidas:** Las promociones se enlazan a sucursales con metadatos de emisor, tipo/tier y porcentaje. Las tarjetas del mapa y del listado muestran el mejor beneficio y cuentan cuántas promos adicionales hay activas.
 
 ## Stack Tecnológico
 
@@ -42,6 +46,9 @@ Un mapa para no perderte ningún descuento en Montevideo y para encontrar el mej
     npm run dev
     ```
     La aplicación estará disponible en [http://localhost:3000](http://localhost:3000).
+
+    Si necesitas refrescar la ubicación manualmente, utiliza el botón **Ajustar** sobre el mapa para introducir una dirección o coordenadas y generar nuevos parámetros `lat`/`lon`.
+    Nota: esta acción realiza una consulta a la Google Geocoding API; si la clave falta o la cuota se agota, el modal mostrará un error.
 
 ## Licencia
 
