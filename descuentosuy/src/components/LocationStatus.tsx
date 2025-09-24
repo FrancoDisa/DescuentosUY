@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import type { GeoState } from '@/utils/locationStorage';
 import { clearGeoState, loadGeoState, saveGeoMeta } from '@/utils/locationStorage';
 
@@ -70,6 +70,7 @@ async function geocodeAddress(address: string) {
 export function LocationStatus() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   const [geoStateVersion, setGeoStateVersion] = useState(0);
   const [geoState, setGeoState] = useState<GeoState | null>(null);
@@ -120,11 +121,12 @@ export function LocationStatus() {
     nextParams.delete('lat');
     nextParams.delete('lon');
     const url = nextParams.toString();
-    router.replace(url ? '/?' + url : '/');
+    const currentPath = typeof window !== 'undefined' ? window.location.pathname : pathname;
+    router.replace(url ? `${currentPath}?${url}` : currentPath);
     if (typeof window !== 'undefined') {
       window.location.reload();
     }
-  }, [router, searchParams]);
+  }, [pathname, router, searchParams]);
 
   const handleOpenDialog = useCallback(() => {
     setErrors(null);
@@ -185,7 +187,9 @@ export function LocationStatus() {
       params.set('lat', targetLat.toString());
       params.set('lon', targetLon.toString());
 
-      router.replace('/?' + params.toString());
+      const queryString = params.toString();
+      const currentPath = typeof window !== 'undefined' ? window.location.pathname : pathname;
+      router.replace(queryString ? `${currentPath}?${queryString}` : currentPath);
       saveGeoMeta({
         lat: targetLat,
         lon: targetLon,
@@ -203,7 +207,7 @@ export function LocationStatus() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [manualAddress, manualLat, manualLon, router, searchParams]);
+  }, [manualAddress, manualLat, manualLon, pathname, router, searchParams]);
 
   const statusMessage = useMemo(() => {
     if (!latParam || !lonParam) {

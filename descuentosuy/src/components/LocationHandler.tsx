@@ -1,30 +1,32 @@
 'use client';
 
 import { useCallback, useEffect, useRef } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { GEO_DENIED_KEY, markGeoDenied, saveGeoMeta } from '@/utils/locationStorage';
 
 export function LocationHandler() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const hasRequestedRef = useRef(false);
   const watchIdRef = useRef<number | null>(null);
   const lastCoordsRef = useRef<{ lat: number; lon: number; accuracy?: number } | null>(null);
 
   const applyLocation = useCallback((latitude: number, longitude: number, { replace }: { replace: boolean }) => {
-    const currentParams = new URLSearchParams(
-      typeof window !== 'undefined' ? window.location.search : searchParams.toString()
-    );
+    const currentSearch = typeof window !== 'undefined' ? window.location.search : searchParams.toString();
+    const currentPath = typeof window !== 'undefined' ? window.location.pathname : pathname;
+    const currentParams = new URLSearchParams(currentSearch);
     currentParams.set('lat', latitude.toString());
     currentParams.set('lon', longitude.toString());
 
-    const url = `/?${currentParams.toString()}`;
+    const queryString = currentParams.toString();
+    const url = queryString ? `${currentPath}?${queryString}` : currentPath;
     if (replace) {
       router.replace(url);
     } else {
       router.push(url);
     }
-  }, [router, searchParams]);
+  }, [pathname, router, searchParams]);
 
   const stopWatching = useCallback(() => {
     if (watchIdRef.current != null) {
