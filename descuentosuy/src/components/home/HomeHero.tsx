@@ -2,11 +2,11 @@
 
 export function HomeHero() {
   return (
-    <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-600 via-indigo-500 to-purple-800 px-6 py-16 text-white shadow-2xl sm:px-10">
+    <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-600 via-indigo-500 to-purple-800 px-4 py-12 text-white shadow-2xl sm:px-6 md:px-10 md:py-16">
       <div className="absolute -left-24 top-1/2 hidden h-64 w-64 -translate-y-1/2 rounded-full bg-white/10 blur-3xl lg:block" aria-hidden />
       <div className="absolute -right-20 -top-16 h-48 w-48 rounded-full bg-purple-400/30 blur-2xl" aria-hidden />
 
-      <div className="relative mx-auto flex max-w-4xl flex-col gap-10 lg:flex-row lg:items-center lg:gap-12">
+      <div className="relative mx-auto flex max-w-4xl flex-col gap-8 lg:flex-row lg:items-center lg:gap-12">
         <div className="flex-1 space-y-6">
           <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1 text-sm font-semibold text-white/80">
             <svg aria-hidden xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
@@ -14,10 +14,10 @@ export function HomeHero() {
             </svg>
             Descuentos verificados en Montevideo
           </span>
-          <h1 className="text-4xl font-bold leading-tight sm:text-5xl">
+          <h1 className="text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
             Descubrí promociones cerca tuyo y ahorrá en cada salida
           </h1>
-          <p className="text-lg text-white/80 sm:text-xl">
+          <p className="text-base text-white/80 sm:text-lg lg:text-xl">
             DescuentosUY reúne beneficios de locales, bancos y tarjetas en un único mapa inteligente. Ajustá tu ubicación, filtrá por emisores y elegí la mejor promo antes de salir.
           </p>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">

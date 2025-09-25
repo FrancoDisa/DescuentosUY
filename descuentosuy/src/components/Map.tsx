@@ -5,6 +5,7 @@ import { useEffect, useMemo } from 'react';
 import L from 'leaflet';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import 'leaflet/dist/leaflet.css';
 
@@ -248,10 +249,11 @@ export function Map({ stores, height }: MapProps) {
                   <div className="flex items-start gap-3">
                     <div className="mt-0.5 h-11 w-11 shrink-0 overflow-hidden rounded-md border border-gray-200 bg-white">
                       {branch.logo_url ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
+                        <Image
                           src={branch.logo_url}
                           alt={`${branch.store_name} logo`}
+                          width={44}
+                          height={44}
                           className="h-full w-full object-contain p-1"
                         />
                       ) : (

@@ -130,3 +130,10 @@ LECCIONES APRENDIDAS Y CONSEJOS TÉCNICOS
     - Al modificar archivos de código, especialmente con operaciones de `replace`, la precisión del `old_string` es crucial. Para cambios grandes o refactors de componentes completos, es más seguro usar `write_file` para sobrescribir el archivo y asegurar el estado deseado.
 6.  **Seguimiento de dependencias externas (NUEVO):**
     - Documentar issues críticos del ecosistema (ej. Next.js #76499) y revisarlos antes de actualizar dependencias que afectan funcionalidades clave como filtros.
+
+==================================================
+ÉPICA 5: LANZAMIENTO
+==================================================
+FASE FUTURA: PRE-LANZAMIENTO (Later)
+
+- [ ] **Tarea Crítica de Seguridad:** Implementar RLS (Row Level Security) en la base de datos justo antes de hacer público el sitio web para proteger los datos contra acceso no autorizado.

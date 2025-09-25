@@ -4,7 +4,7 @@ import { LocationHandler } from '@/components/LocationHandler';
 import { StoreList } from '@/components/StoreList';
 import { createPublicClient } from '@/utils/supabase/server';
 import type { Promotion, Store } from '@/components/StoreCard';
-import { HomeHero, HomeHighlights, HomeBenefits, HomeMapPreview, HomeCTA } from '@/components/home';
+import { HomeHero, HomeHighlights, HomeBenefits, HomeMapPreview, HomeCTA, FilterChips } from '@/components/home';
 
 export const dynamic = 'force-dynamic';
 
@@ -132,7 +132,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
         <HomeHero />
 
         <section className="-mt-12">
-          <div className="mx-auto max-w-4xl rounded-3xl bg-white p-6 shadow-xl sm:p-8">
+          <div className="mx-auto max-w-4xl rounded-3xl bg-white p-4 shadow-xl sm:p-6 md:p-8">
             <form method="GET" action="/" className="flex flex-col gap-4 md:flex-row md:items-end">
               <div className="flex-1 space-y-2">
                 <label htmlFor="query" className="text-sm font-semibold text-gray-700">
@@ -171,6 +171,9 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
                 </button>
               </div>
             </form>
+            <div className="mt-6">
+              <FilterChips />
+            </div>
           </div>
         </section>
 
