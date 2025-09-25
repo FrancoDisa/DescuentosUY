@@ -1,5 +1,6 @@
 export const GEO_META_KEY = 'descuentosuy:geo-meta';
 export const GEO_DENIED_KEY = 'descuentosuy:geo-denied';
+export const GEO_STATE_EVENT = 'descuentosuy:geo-state-change';
 
 export type GeoMetaSource = 'gps' | 'manual';
 
@@ -14,6 +15,13 @@ export type GeoMeta = {
 export type GeoState =
   | { status: 'denied'; updatedAt?: number }
   | ({ status?: 'granted' } & GeoMeta);
+
+function notifyGeoStateChange() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  window.dispatchEvent(new CustomEvent(GEO_STATE_EVENT));
+}
 
 export function loadGeoState(): GeoState | null {
   if (typeof window === 'undefined') {
@@ -48,6 +56,7 @@ export function saveGeoMeta(meta: GeoMeta & { status?: 'granted' }) {
   window.sessionStorage.setItem(GEO_META_KEY, JSON.stringify(meta));
   window.sessionStorage.removeItem(GEO_DENIED_KEY);
   window.sessionStorage.removeItem(timestampKey);
+  notifyGeoStateChange();
 }
 
 export function markGeoDenied() {
@@ -58,6 +67,7 @@ export function markGeoDenied() {
   window.sessionStorage.setItem(GEO_DENIED_KEY, 'true');
   window.sessionStorage.setItem(timestampKey, Date.now().toString());
   window.sessionStorage.removeItem(GEO_META_KEY);
+  notifyGeoStateChange();
 }
 
 export function clearGeoState() {
@@ -68,4 +78,5 @@ export function clearGeoState() {
   window.sessionStorage.removeItem(GEO_META_KEY);
   window.sessionStorage.removeItem(GEO_DENIED_KEY);
   window.sessionStorage.removeItem(timestampKey);
+  notifyGeoStateChange();
 }

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import type { GeoState } from '@/utils/locationStorage';
-import { clearGeoState, loadGeoState, saveGeoMeta } from '@/utils/locationStorage';
+import { GEO_STATE_EVENT, clearGeoState, loadGeoState, saveGeoMeta } from '@/utils/locationStorage';
 
 function formatAccuracy(accuracy?: number) {
   if (accuracy == null || Number.isNaN(accuracy)) {
@@ -72,7 +72,6 @@ export function LocationStatus() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
-  const [geoStateVersion, setGeoStateVersion] = useState(0);
   const [geoState, setGeoState] = useState<GeoState | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [manualAddress, setManualAddress] = useState('');
@@ -96,16 +95,12 @@ export function LocationStatus() {
       return;
     }
 
-    const handleStorage = (event: StorageEvent) => {
-      if (event.key && event.key.startsWith('descuentosuy:geo')) {
-        setGeoStateVersion(function (value) {
-          return value + 1;
-        });
-      }
+    const handleGeoStateChange = () => {
+      setGeoState(loadGeoState());
     };
 
-    window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
+    window.addEventListener(GEO_STATE_EVENT, handleGeoStateChange);
+    return () => window.removeEventListener(GEO_STATE_EVENT, handleGeoStateChange);
   }, []);
 
   useEffect(() => {
@@ -113,7 +108,7 @@ export function LocationStatus() {
       return;
     }
     setGeoState(loadGeoState());
-  }, [geoStateVersion, latParam, lonParam]);
+  }, [latParam, lonParam]);
 
   const handleRetry = useCallback(() => {
     clearGeoState();
@@ -198,9 +193,6 @@ export function LocationStatus() {
         accuracy,
         status: 'granted',
       });
-      setGeoStateVersion(function (value) {
-        return value + 1;
-      });
       setIsDialogOpen(false);
     } catch (error) {
       setErrors(error instanceof Error ? error.message : 'Ocurrio un error.');
@@ -210,14 +202,14 @@ export function LocationStatus() {
   }, [manualAddress, manualLat, manualLon, pathname, router, searchParams]);
 
   const statusMessage = useMemo(() => {
-    if (!latParam || !lonParam) {
-      return 'Buscando tu ubicacion';
-    }
     if (geoState?.status === 'denied') {
       return 'Permiso de ubicacion denegado';
     }
     if (geoState?.source === 'manual') {
       return 'Ubicacion ajustada manualmente';
+    }
+    if (!latParam || !lonParam) {
+      return 'Buscando tu ubicacion';
     }
     return 'Ubicacion detectada';
   }, [geoState, latParam, lonParam]);
