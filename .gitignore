@@ -44,3 +44,6 @@ dist/
 
 # CSV/exports (keep if needed; comment out to include)
 # *.csv
+
+# MCP Configuration (contains sensitive tokens)
+.mcp.json
