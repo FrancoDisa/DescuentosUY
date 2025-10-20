@@ -108,25 +108,27 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
   const mapHref = mapParams.size > 0 ? `/mapa?${mapParams.toString()}` : '/mapa';
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-brand-50/20">
+    <div className="min-h-screen bg-gray-50">
       <LocationHandler />
 
-      <header className="sticky top-0 z-40 border-b border-brand-100/50 bg-white/80 shadow-sm shadow-brand-500/5 backdrop-blur-xl">
+      <header className="sticky top-0 z-40 border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur-sm">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="group flex items-center gap-2 text-lg font-bold text-brand-700 transition-colors hover:text-brand-600">
-            <svg className="h-6 w-6 transition-transform group-hover:scale-110" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" fill="currentColor"/>
-              <circle cx="12" cy="12" r="3" fill="white"/>
+          <Link href="/" className="flex items-center gap-2 text-xl font-black text-gray-900 transition-colors hover:text-brand-600">
+            <svg className="h-7 w-7 text-brand-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z" fill="currentColor"/>
+              <path d="M9 12l2 2 4-4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
             DescuentosUY
           </Link>
-          <nav className="flex items-center gap-3 text-sm font-medium">
-            <Link href="#top-promos" className="hidden text-gray-600 transition-colors hover:text-brand-600 sm:block">
+          <nav className="flex items-center gap-4">
+            <Link href="#top-promos" className="hidden text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 sm:block">
               Destacados
             </Link>
-            <Link href={mapHref} className="inline-flex items-center gap-1.5 rounded-full border border-brand-200 bg-gradient-to-r from-brand-50 to-accent-50 px-4 py-2 text-brand-700 shadow-sm transition-all duration-300 hover:border-brand-300 hover:shadow-md hover:shadow-brand-500/20">
+            <Link href={mapHref} className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-700">
               Ver mapa
-              <span aria-hidden className="transition-transform group-hover:translate-x-0.5">&rarr;</span>
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+              </svg>
             </Link>
           </nav>
         </div>
@@ -135,49 +137,51 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
       <main className="mx-auto flex w-full max-w-7xl flex-col gap-12 px-4 pb-16 pt-10 sm:px-6 lg:px-8">
         <HomeHero />
 
-        <section className="-mt-12">
-          <div className="mx-auto max-w-4xl rounded-3xl border border-brand-100/50 bg-white p-4 shadow-2xl shadow-brand-500/10 sm:p-6 md:p-8">
-            <form method="GET" action="/" className="flex flex-col gap-4 md:flex-row md:items-end">
-              <div className="flex-1 space-y-2">
-                <label htmlFor="query" className="text-sm font-semibold text-gray-700">
-                  Buscar locales o promociones
-                </label>
-                <input
-                  id="query"
-                  type="search"
-                  name="query"
-                  defaultValue={query || ''}
-                  placeholder="Ej: hamburguesa, cafe, Santander..."
-                  className="w-full rounded-xl border-2 border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-700 shadow-sm transition-all duration-200 placeholder:text-gray-400 focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-100"
-                />
+        <section className="-mt-8">
+          <div className="mx-auto max-w-4xl rounded-xl border border-gray-200 bg-white p-6 shadow-lg sm:p-8">
+            <form method="GET" action="/" className="space-y-4">
+              <div className="flex flex-col gap-4 md:flex-row">
+                <div className="flex-1 space-y-2">
+                  <label htmlFor="query" className="text-sm font-medium text-gray-700">
+                    Buscar locales o promociones
+                  </label>
+                  <input
+                    id="query"
+                    type="search"
+                    name="query"
+                    defaultValue={query || ''}
+                    placeholder="Ej: hamburguesa, cafe, Santander..."
+                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                  />
+                </div>
+                <div className="md:w-48">
+                  <label htmlFor="sort" className="text-sm font-medium text-gray-700">
+                    Ordenar por
+                  </label>
+                  <select
+                    id="sort"
+                    name="sort"
+                    defaultValue={sort || 'default'}
+                    className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                  >
+                    <option value="default">Recomendados</option>
+                    <option value="max_discount">Mayor descuento</option>
+                    <option value="distance">Cercanía</option>
+                  </select>
+                </div>
+                <div className="flex items-end md:w-auto">
+                  <button
+                    type="submit"
+                    className="w-full rounded-lg bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-700 md:w-auto"
+                  >
+                    Buscar
+                  </button>
+                </div>
               </div>
-              <div className="md:w-56">
-                <label htmlFor="sort" className="text-sm font-semibold text-gray-700">
-                  Ordenar resultados
-                </label>
-                <select
-                  id="sort"
-                  name="sort"
-                  defaultValue={sort || 'default'}
-                  className="mt-2 w-full rounded-xl border-2 border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-700 shadow-sm transition-all duration-200 focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-100"
-                >
-                  <option value="default">Recomendados</option>
-                  <option value="max_discount">Mayor descuento</option>
-                  <option value="distance">Cercanía</option>
-                </select>
-              </div>
-              <div className="md:w-auto">
-                <button
-                  type="submit"
-                  className="w-full rounded-xl bg-gradient-to-r from-brand-600 to-accent-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-500/30 transition-all duration-200 hover:from-brand-700 hover:to-accent-700 hover:shadow-xl hover:shadow-brand-500/40 active:scale-95 md:w-auto"
-                >
-                  Buscar
-                </button>
+              <div className="border-t border-gray-100 pt-4">
+                <FilterChips />
               </div>
             </form>
-            <div className="mt-6">
-              <FilterChips />
-            </div>
           </div>
         </section>
 
@@ -188,13 +192,13 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
         <HomeMapPreview href={mapHref} />
 
         <section className="space-y-6">
-          <div className="flex flex-col gap-3">
+          <div className="space-y-2">
             <h2 className="text-3xl font-bold text-gray-900 lg:text-4xl">Todos los locales con beneficios</h2>
             <p className="text-base text-gray-600">
-              Explorá el listado completo y abrí la ficha para ver horarios, teléfonos y promociones adicionales.
+              Explorá el listado completo y hacé clic en cualquier local para ver horarios, teléfonos y promociones adicionales.
             </p>
           </div>
-          <Suspense fallback={<div className="rounded-2xl border border-brand-200/50 bg-gradient-to-br from-brand-50 to-accent-50/30 p-8 text-center text-sm font-medium text-brand-700 shadow-lg">Cargando locales...</div>}>
+          <Suspense fallback={<div className="rounded-xl border border-gray-200 bg-white p-8 text-center text-sm text-gray-500 shadow-sm">Cargando locales...</div>}>
             <StoreList stores={uniqueStores} query={query} userLocation={userLocation} />
           </Suspense>
         </section>
