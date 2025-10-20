@@ -48,17 +48,21 @@ export default async function MapPage({ searchParams }: { searchParams: Promise<
 
   if (error) {
     return (
-      <div className="bg-gray-50 min-h-screen">
-        <header className="bg-white shadow-sm">
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-brand-50/20">
+        <header className="border-b border-brand-100/50 bg-white/80 shadow-sm shadow-brand-500/5 backdrop-blur-xl">
           <div className="max-w-5xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            <Link href="/?" className="text-purple-600 hover:text-purple-800">&larr; Volver al inicio</Link>
-            <h1 className="mt-2 text-3xl font-semibold text-gray-900">Mapa de descuentos</h1>
+            <Link href="/?" className="group inline-flex items-center gap-1 text-brand-600 font-semibold transition-colors hover:text-brand-700">
+              <span className="transition-transform group-hover:-translate-x-1">&larr;</span>
+              Volver al inicio
+            </Link>
+            <h1 className="mt-2 text-3xl font-bold text-gray-900">Mapa de descuentos</h1>
           </div>
         </header>
         <main className="max-w-5xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-          <p className="rounded-lg bg-red-50 px-4 py-3 text-center text-red-600 shadow">
-            No pudimos cargar el mapa: {error.message}
-          </p>
+          <div className="rounded-2xl border border-red-200 bg-gradient-to-br from-red-50 to-red-100/50 px-6 py-4 text-center shadow-lg">
+            <p className="font-semibold text-red-900">No pudimos cargar el mapa</p>
+            <p className="mt-1 text-sm text-red-700">{error.message}</p>
+          </div>
         </main>
       </div>
     );
@@ -82,19 +86,22 @@ export default async function MapPage({ searchParams }: { searchParams: Promise<
   const listHref = listParams.size > 0 ? `/?${listParams.toString()}` : '/?';
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-brand-50/20">
       <LocationHandler />
-      <header className="bg-white shadow-sm">
+      <header className="border-b border-brand-100/50 bg-white/80 shadow-sm shadow-brand-500/5 backdrop-blur-xl">
         <div className="max-w-5xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <Link href="/?" className="text-purple-600 hover:text-purple-800">&larr; Volver al inicio</Link>
+          <Link href="/?" className="group inline-flex items-center gap-1 text-brand-600 font-semibold transition-colors hover:text-brand-700">
+            <span className="transition-transform group-hover:-translate-x-1">&larr;</span>
+            Volver al inicio
+          </Link>
           <div className="mt-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <div>
-              <h1 className="text-3xl font-semibold text-gray-900">Mapa de descuentos</h1>
-              <p className="text-sm text-gray-500">Explora sucursales cercanas y afina tu ubicación en tiempo real.</p>
+              <h1 className="text-3xl font-bold text-gray-900 lg:text-4xl">Mapa de descuentos</h1>
+              <p className="text-base text-gray-600">Explora sucursales cercanas y afina tu ubicación en tiempo real.</p>
             </div>
             <Link
               href={listHref}
-              className="inline-flex items-center justify-center rounded-full border border-purple-200 px-4 py-2 text-sm font-semibold text-purple-700 transition hover:bg-purple-600 hover:text-white"
+              className="inline-flex items-center justify-center gap-1.5 rounded-full border border-brand-200 bg-gradient-to-r from-brand-50 to-accent-50 px-4 py-2 text-sm font-semibold text-brand-700 shadow-sm transition-all duration-300 hover:border-brand-300 hover:shadow-md hover:shadow-brand-500/20"
             >
               Ver lista de locales
             </Link>
@@ -103,7 +110,7 @@ export default async function MapPage({ searchParams }: { searchParams: Promise<
       </header>
 
       <main className="max-w-6xl mx-auto px-4 py-10 sm:px-6 lg:px-8">
-        <div className="overflow-hidden rounded-2xl bg-white shadow-lg">
+        <div className="overflow-hidden rounded-2xl border border-brand-100/50 bg-white shadow-2xl shadow-brand-500/10">
           <MapLoader stores={branches} height="75vh" />
         </div>
       </main>

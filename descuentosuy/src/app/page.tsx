@@ -108,31 +108,35 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
   const mapHref = mapParams.size > 0 ? `/mapa?${mapParams.toString()}` : '/mapa';
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-brand-50/20">
       <LocationHandler />
 
-      <header className="sticky top-0 z-40 border-b border-gray-100 bg-white/80 backdrop-blur">
+      <header className="sticky top-0 z-40 border-b border-brand-100/50 bg-white/80 shadow-sm shadow-brand-500/5 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="text-lg font-bold text-purple-700">
+          <Link href="/" className="group flex items-center gap-2 text-lg font-bold text-brand-700 transition-colors hover:text-brand-600">
+            <svg className="h-6 w-6 transition-transform group-hover:scale-110" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" fill="currentColor"/>
+              <circle cx="12" cy="12" r="3" fill="white"/>
+            </svg>
             DescuentosUY
           </Link>
-          <nav className="flex items-center gap-4 text-sm font-medium text-gray-600">
-            <Link href="#top-promos" className="hover:text-purple-600">
+          <nav className="flex items-center gap-3 text-sm font-medium">
+            <Link href="#top-promos" className="hidden text-gray-600 transition-colors hover:text-brand-600 sm:block">
               Destacados
             </Link>
-            <Link href={mapHref} className="inline-flex items-center gap-1 rounded-full border border-purple-200 px-3 py-1 text-purple-700 transition hover:bg-purple-600 hover:text-white">
+            <Link href={mapHref} className="inline-flex items-center gap-1.5 rounded-full border border-brand-200 bg-gradient-to-r from-brand-50 to-accent-50 px-4 py-2 text-brand-700 shadow-sm transition-all duration-300 hover:border-brand-300 hover:shadow-md hover:shadow-brand-500/20">
               Ver mapa
-              <span aria-hidden>&rarr;</span>
+              <span aria-hidden className="transition-transform group-hover:translate-x-0.5">&rarr;</span>
             </Link>
           </nav>
         </div>
       </header>
 
-      <main className="mx-auto flex w-full max-w-7xl flex-col gap-16 px-4 pb-16 pt-10 sm:px-6 lg:px-8">
+      <main className="mx-auto flex w-full max-w-7xl flex-col gap-12 px-4 pb-16 pt-10 sm:px-6 lg:px-8">
         <HomeHero />
 
         <section className="-mt-12">
-          <div className="mx-auto max-w-4xl rounded-3xl bg-white p-4 shadow-xl sm:p-6 md:p-8">
+          <div className="mx-auto max-w-4xl rounded-3xl border border-brand-100/50 bg-white p-4 shadow-2xl shadow-brand-500/10 sm:p-6 md:p-8">
             <form method="GET" action="/" className="flex flex-col gap-4 md:flex-row md:items-end">
               <div className="flex-1 space-y-2">
                 <label htmlFor="query" className="text-sm font-semibold text-gray-700">
@@ -144,7 +148,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
                   name="query"
                   defaultValue={query || ''}
                   placeholder="Ej: hamburguesa, cafe, Santander..."
-                  className="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm text-gray-700 shadow-sm focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                  className="w-full rounded-xl border-2 border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-700 shadow-sm transition-all duration-200 placeholder:text-gray-400 focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-100"
                 />
               </div>
               <div className="md:w-56">
@@ -155,7 +159,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
                   id="sort"
                   name="sort"
                   defaultValue={sort || 'default'}
-                  className="mt-2 w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm text-gray-700 shadow-sm focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                  className="mt-2 w-full rounded-xl border-2 border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-700 shadow-sm transition-all duration-200 focus:border-brand-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-100"
                 >
                   <option value="default">Recomendados</option>
                   <option value="max_discount">Mayor descuento</option>
@@ -165,7 +169,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
               <div className="md:w-auto">
                 <button
                   type="submit"
-                  className="w-full rounded-2xl bg-purple-600 px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-purple-700 md:w-auto"
+                  className="w-full rounded-xl bg-gradient-to-r from-brand-600 to-accent-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-500/30 transition-all duration-200 hover:from-brand-700 hover:to-accent-700 hover:shadow-xl hover:shadow-brand-500/40 active:scale-95 md:w-auto"
                 >
                   Buscar
                 </button>
@@ -184,13 +188,13 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
         <HomeMapPreview href={mapHref} />
 
         <section className="space-y-6">
-          <div className="flex flex-col gap-2">
-            <h2 className="text-3xl font-bold text-gray-900">Todos los locales con beneficios</h2>
-            <p className="text-sm text-gray-600">
+          <div className="flex flex-col gap-3">
+            <h2 className="text-3xl font-bold text-gray-900 lg:text-4xl">Todos los locales con beneficios</h2>
+            <p className="text-base text-gray-600">
               Explorá el listado completo y abrí la ficha para ver horarios, teléfonos y promociones adicionales.
             </p>
           </div>
-          <Suspense fallback={<div className="rounded-2xl border border-gray-200 bg-white p-8 text-center text-sm text-gray-500">Cargando locales...</div>}>
+          <Suspense fallback={<div className="rounded-2xl border border-brand-200/50 bg-gradient-to-br from-brand-50 to-accent-50/30 p-8 text-center text-sm font-medium text-brand-700 shadow-lg">Cargando locales...</div>}>
             <StoreList stores={uniqueStores} query={query} userLocation={userLocation} />
           </Suspense>
         </section>

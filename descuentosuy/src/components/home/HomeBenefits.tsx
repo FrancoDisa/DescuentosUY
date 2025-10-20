@@ -30,25 +30,28 @@
 
 export function HomeBenefits() {
   return (
-    <section className="rounded-3xl border border-purple-100 bg-purple-50/70 px-6 py-12 sm:px-10">
-      <div className="mx-auto max-w-4xl space-y-10 text-center">
+    <section className="relative overflow-hidden rounded-3xl border border-brand-200/50 bg-gradient-to-br from-brand-50 via-white to-accent-50/30 px-6 py-12 shadow-xl shadow-brand-500/5 sm:px-10">
+      <div className="absolute -right-20 top-0 h-40 w-40 rounded-full bg-brand-200/20 blur-3xl" aria-hidden />
+      <div className="absolute -left-20 bottom-0 h-40 w-40 rounded-full bg-accent-200/20 blur-3xl" aria-hidden />
+
+      <div className="relative mx-auto max-w-4xl space-y-10 text-center">
         <div className="space-y-3">
-          <p className="text-sm font-semibold uppercase tracking-wide text-purple-600">¿Por qué usar DescuentosUY?</p>
-          <h2 className="text-3xl font-bold text-gray-900">Una experiencia pensada para planificar tus salidas</h2>
-          <p className="text-base text-gray-600">
+          <p className="text-sm font-bold uppercase tracking-wide text-brand-600">¿Por qué usar DescuentosUY?</p>
+          <h2 className="text-3xl font-bold text-gray-900 lg:text-4xl">Una experiencia pensada para planificar tus salidas</h2>
+          <p className="text-base text-gray-600 lg:text-lg">
             Integramos fuentes oficiales, ubicaciones precisas y herramientas para que compares beneficios sin perder tiempo.
           </p>
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {benefits.map((benefit) => (
-            <article key={benefit.title} className="flex h-full flex-col gap-4 rounded-2xl bg-white/90 p-6 text-left shadow-sm">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-100">
+            <article key={benefit.title} className="group flex h-full flex-col gap-4 rounded-2xl border border-brand-100/50 bg-white/95 p-6 text-left shadow-lg shadow-brand-500/5 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-500/10">
+              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-brand-100 to-accent-100 shadow-md transition-transform duration-300 group-hover:scale-110">
                 {benefit.icon}
               </div>
               <div className="space-y-2">
-                <h3 className="text-lg font-semibold text-gray-900">{benefit.title}</h3>
-                <p className="text-sm text-gray-600">{benefit.description}</p>
+                <h3 className="text-lg font-bold text-gray-900">{benefit.title}</h3>
+                <p className="text-sm leading-relaxed text-gray-600">{benefit.description}</p>
               </div>
             </article>
           ))}
