@@ -11,10 +11,10 @@ type ChipProps = {
 };
 
 function Chip({ label, active, onClick, disabled }: ChipProps) {
-  const baseClasses = "cursor-pointer rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200";
-  const activeClasses = "bg-gradient-to-r from-brand-600 to-accent-600 text-white shadow-lg shadow-brand-500/30";
-  const inactiveClasses = "bg-white text-gray-700 shadow-sm border border-brand-200/50 hover:bg-brand-50 hover:border-brand-300 hover:shadow-md active:scale-95";
-  const disabledClasses = "cursor-not-allowed bg-gray-100 text-gray-400 border border-gray-200";
+  const baseClasses = "cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition-colors";
+  const activeClasses = "bg-brand-600 text-white";
+  const inactiveClasses = "bg-gray-100 text-gray-700 hover:bg-gray-200";
+  const disabledClasses = "cursor-not-allowed bg-gray-100 text-gray-400";
 
   const getClasses = () => {
     if (disabled) return `${baseClasses} ${disabledClasses}`;
@@ -49,12 +49,10 @@ export function FilterChips() {
       </div>
       {showTooltip && (
         <div className="absolute top-full mt-2 w-full md:w-auto z-10">
-          <div className="rounded-xl border border-yellow-200 bg-gradient-to-br from-yellow-50 to-amber-50 p-4 text-center text-sm shadow-xl shadow-yellow-500/10 backdrop-blur-sm">
-            <p className="font-semibold text-yellow-900">
-              <strong>Funcionalidad en desarrollo.</strong>
-            </p>
-            <p className="mt-1 text-yellow-800">
-              Los filtros estarán disponibles en una futura actualización de Next.js.
+          <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm shadow-lg">
+            <p className="font-semibold text-amber-900">Funcionalidad en desarrollo</p>
+            <p className="mt-1 text-amber-700">
+              Los filtros estarán disponibles próximamente.
             </p>
           </div>
         </div>
