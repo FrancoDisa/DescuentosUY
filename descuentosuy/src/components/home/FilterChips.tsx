@@ -23,7 +23,7 @@ function Chip({ label, active, onClick, disabled }: ChipProps) {
   };
 
   return (
-    <button className={getClasses()} onClick={onClick} disabled={disabled}>
+    <button type="button" className={getClasses()} onClick={onClick} disabled={disabled}>
       {label}
     </button>
   );
