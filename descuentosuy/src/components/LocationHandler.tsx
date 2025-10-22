@@ -11,6 +11,8 @@ export function LocationHandler() {
   const hasRequestedRef = useRef(false);
   const watchIdRef = useRef<number | null>(null);
   const lastCoordsRef = useRef<{ lat: number; lon: number; accuracy?: number } | null>(null);
+  const lastUpdateTimeRef = useRef<number>(0);
+  const DEBOUNCE_MS = 5000; // Esperar al menos 5 segundos entre actualizaciones
 
   const applyLocation = useCallback((latitude: number, longitude: number, { replace }: { replace: boolean }) => {
     const currentSearch = typeof window !== 'undefined' ? window.location.search : searchParams.toString();
@@ -88,6 +90,7 @@ export function LocationHandler() {
         (position) => {
           const { latitude, longitude, accuracy } = position.coords;
           lastCoordsRef.current = { lat: latitude, lon: longitude, accuracy };
+          lastUpdateTimeRef.current = Date.now();
           applyLocation(latitude, longitude, { replace: false });
           if (typeof window !== 'undefined') {
             saveGeoMeta({
@@ -103,10 +106,18 @@ export function LocationHandler() {
             (update) => {
               const { latitude: newLat, longitude: newLon, accuracy: newAccuracy } = update.coords;
               const last = lastCoordsRef.current;
+              const now = Date.now();
+              const timeSinceLastUpdate = now - lastUpdateTimeRef.current;
+
+              // No actualizar si no ha pasado suficiente tiempo (debounce)
+              if (timeSinceLastUpdate < DEBOUNCE_MS) {
+                return;
+              }
 
               const hasImprovedAccuracy =
                 typeof newAccuracy === 'number' &&
-                (last?.accuracy == null || newAccuracy < last.accuracy - 10);
+                typeof last?.accuracy === 'number' &&
+                newAccuracy < last.accuracy - 10;
 
               const distanceMoved =
                 !last
@@ -116,8 +127,10 @@ export function LocationHandler() {
                       (newLon - last.lon) * (newLon - last.lon)
                     ) * 111_139; // aprox metros
 
-              if (hasImprovedAccuracy || distanceMoved > 20) {
+              // Actualizar solo si ha mejorado la precisión O si ha movido más de 30 metros
+              if (hasImprovedAccuracy || distanceMoved > 30) {
                 lastCoordsRef.current = { lat: newLat, lon: newLon, accuracy: newAccuracy };
+                lastUpdateTimeRef.current = now;
                 applyLocation(newLat, newLon, { replace: true });
                 if (typeof window !== 'undefined') {
                   saveGeoMeta({

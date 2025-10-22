@@ -49,7 +49,7 @@ export function StoreCard({ store, userLocation }: StoreCardProps) {
 
   return (
     <Link href={href} className="block h-full">
-      <article className="group flex h-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-white transition-all duration-200 hover:border-brand-300 hover:shadow-lg">
+      <article className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-white transition-all duration-200 hover:border-brand-300 hover:shadow-lg">
         {/* Discount Hero Section */}
         {topPromotion && promoValueLabel ? (
           <div className="relative border-b border-gray-100 bg-gradient-to-br from-accent-500 to-accent-600 px-6 py-8 text-center">

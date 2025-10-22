@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import type { Metadata, Viewport } from 'next';
 import Link from 'next/link';
 import { LocationHandler } from '@/components/LocationHandler';
 import { StoreList } from '@/components/StoreList';
@@ -7,6 +8,38 @@ import type { Promotion, Store } from '@/components/StoreCard';
 import { HomeHero, HomeHighlights, HomeBenefits, HomeMapPreview, HomeCTA, FilterChips } from '@/components/home';
 
 export const dynamic = 'force-dynamic';
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+};
+
+export const metadata: Metadata = {
+  title: 'DescuentosUY - Encuentra los mejores descuentos cerca tuyo',
+  description: 'Descubre promociones de locales, bancos y tarjetas en tiempo real. Busca por categoría, ordenamiento y ubicación. Todos tus descuentos en un solo lugar.',
+  keywords: ['descuentos', 'promociones', 'uruguay', 'montevideo', 'locales', 'tarjetas'],
+  openGraph: {
+    title: 'DescuentosUY - Descuentos cerca tuyo',
+    description: 'Encuentra las mejores promociones locales en tiempo real',
+    type: 'website',
+    locale: 'es_UY',
+    images: [
+      {
+        url: 'https://descuentosuy.vercel.app/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'DescuentosUY - Descuentos',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'DescuentosUY - Descuentos cerca tuyo',
+    description: 'Encuentra las mejores promociones locales en tiempo real',
+  },
+  robots: 'index, follow',
+};
 
 type Branch = {
   store_id: string;
@@ -130,6 +163,13 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
               </svg>
             </Link>
+            <Link href="/admin/cargar" className="hidden text-xs font-medium text-gray-500 transition-colors hover:text-gray-700 md:inline-flex items-center gap-1" title="Panel de administración">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              Admin
+            </Link>
           </nav>
         </div>
       </header>
@@ -137,12 +177,12 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
       <main className="mx-auto flex w-full max-w-7xl flex-col gap-12 px-4 pb-16 pt-10 sm:px-6 lg:px-8">
         <HomeHero />
 
-        <section className="-mt-8">
-          <div className="mx-auto max-w-4xl rounded-xl border border-gray-200 bg-white p-6 shadow-lg sm:p-8">
-            <form method="GET" action="/" className="space-y-4">
-              <div className="flex flex-col gap-4 md:flex-row">
-                <div className="flex-1 space-y-2">
-                  <label htmlFor="query" className="text-sm font-medium text-gray-700">
+        <section className="-mt-6 sm:-mt-8">
+          <div className="mx-auto max-w-4xl rounded-xl border border-gray-200 bg-white p-4 shadow-lg sm:p-6 lg:p-8">
+            <form method="GET" action="/" className="space-y-3 sm:space-y-4">
+              <div className="flex flex-col gap-3 md:flex-row md:gap-4">
+                <div className="flex-1 space-y-1.5 sm:space-y-2">
+                  <label htmlFor="query" className="text-xs font-medium text-gray-700 sm:text-sm">
                     Buscar locales o promociones
                   </label>
                   <input
@@ -150,36 +190,38 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
                     type="search"
                     name="query"
                     defaultValue={query || ''}
-                    placeholder="Ej: hamburguesa, cafe, Santander..."
-                    className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                    placeholder="Ej: hamburguesa, cafe..."
+                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs text-gray-900 transition-colors placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 sm:px-4 sm:py-2.5 sm:text-sm"
                   />
                 </div>
-                <div className="md:w-48">
-                  <label htmlFor="sort" className="text-sm font-medium text-gray-700">
+                <div className="md:w-44">
+                  <label htmlFor="sort" className="text-xs font-medium text-gray-700 sm:text-sm">
                     Ordenar por
                   </label>
                   <select
                     id="sort"
                     name="sort"
                     defaultValue={sort || 'default'}
-                    className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                    className="mt-1.5 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 sm:px-4 sm:py-2.5 sm:text-sm sm:mt-2"
                   >
                     <option value="default">Recomendados</option>
                     <option value="max_discount">Mayor descuento</option>
                     <option value="distance">Cercanía</option>
                   </select>
                 </div>
-                <div className="flex items-end md:w-auto">
+                <div className="flex items-end">
                   <button
                     type="submit"
-                    className="w-full rounded-lg bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-700 md:w-auto"
+                    className="w-full rounded-lg bg-brand-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-brand-700 md:w-auto sm:px-6 sm:py-2.5 sm:text-sm"
                   >
                     Buscar
                   </button>
                 </div>
               </div>
-              <div className="border-t border-gray-100 pt-4">
-                <FilterChips />
+              <div className="border-t border-gray-100 pt-3 sm:pt-4">
+                <Suspense fallback={<div className="h-10 bg-gray-50 rounded-lg animate-pulse" />}>
+                  <FilterChips />
+                </Suspense>
               </div>
             </form>
           </div>

@@ -1,0 +1,9 @@
+{
+  "enabledMcpjsonServers": [
+    "context7",
+    "chrome-devtools",
+    "github",
+    "supabase"
+  ],
+  "enableAllProjectMcpServers": true
+}

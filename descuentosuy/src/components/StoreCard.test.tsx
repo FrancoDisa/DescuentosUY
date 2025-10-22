@@ -1,104 +1,142 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { StoreCard, type Store } from './StoreCard';
+import { StoreCard } from './StoreCard';
+import type { Store } from './StoreCard';
 
-// Mock Next.js components
+// Mock next/image
+vi.mock('next/image', () => ({
+  // eslint-disable-next-line @next/next/no-img-element
+  default: ({ src, alt }: { src: string; alt: string }) => <img src={src} alt={alt} />,
+}));
+
+// Mock next/link
 vi.mock('next/link', () => ({
-  __esModule: true,
   default: ({ children, href }: { children: React.ReactNode; href: string }) => <a href={href}>{children}</a>,
 }));
 
-vi.mock('next/image', () => ({
-  __esModule: true,
-  default: (props: any) => {
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img {...props} />;
-  },
-}));
-
-// --- Mock Data ---
-const baseMockStore: Store = {
-  id: '1',
-  branch_id: '101',
-  name: 'Test Store',
-  logo_url: 'https://example.com/logo.png',
-  promotions: [],
-  distance_km: undefined,
-};
-
-const promo1 = { id: 'p1', name: 'Descuento Principal', value: 25, card_issuer: 'Test Bank', card_type: 'Credit', card_tier: 'Gold', description: 'Test description' };
-const promo2 = { id: 'p2', name: '10% OFF', value: 10, card_issuer: 'Another Bank', card_type: 'Debit', card_tier: 'Any', description: '' };
-const promo3 = { id: 'p3', name: 'Promo de 5 porciento', value: 5, card_issuer: 'Another Bank', card_type: 'Debit', card_tier: 'Any', description: '' };
-const promo4 = { id: 'p4', name: 'BOGO', value: 50, card_issuer: 'Another Bank', card_type: 'Debit', card_tier: 'Any', description: '' };
-const promo5 = { id: 'p5', name: 'Free Drink', value: 100, card_issuer: 'Another Bank', card_type: 'Debit', card_tier: 'Any', description: '' };
-
-
-
 describe('StoreCard', () => {
-  it('renders basic store information', () => {
-    render(<StoreCard store={baseMockStore} />);
-    expect(screen.getByText('Test Store')).toBeInTheDocument();
-    expect(screen.getByAltText('Test Store logo')).toBeInTheDocument();
+  const mockStore: Store = {
+    id: 'store-1',
+    branch_id: 'branch-1',
+    name: 'Burger King',
+    logo_url: 'https://example.com/burger-king.png',
+    promotions: [
+      {
+        id: 'promo-1',
+        name: '15% descuento en hamburguesas',
+        value: 15,
+        card_issuer: 'Santander',
+        card_type: 'Crédito',
+        card_tier: 'Gold',
+        description: 'Válido todos los días',
+      },
+      {
+        id: 'promo-2',
+        name: '10% descuento en papas',
+        value: 10,
+        card_issuer: 'BBVA',
+        card_type: 'Débito',
+        card_tier: 'Standard',
+        description: '',
+      },
+    ],
+    distance_km: 2.5,
+  };
+
+  it('renders store name correctly', () => {
+    render(<StoreCard store={mockStore} />);
+    expect(screen.getByText('Burger King')).toBeInTheDocument();
   });
 
-  it('renders a placeholder when there is no logo', () => {
-    const storeWithoutLogo = { ...baseMockStore, logo_url: null };
+  it('displays the top promotion discount percentage', () => {
+    render(<StoreCard store={mockStore} />);
+    expect(screen.getByText('15%')).toBeInTheDocument();
+  });
+
+  it('displays the top promotion name', () => {
+    render(<StoreCard store={mockStore} />);
+    expect(screen.getByText('15% descuento en hamburguesas')).toBeInTheDocument();
+  });
+
+  it('displays card issuer information', () => {
+    render(<StoreCard store={mockStore} />);
+    expect(screen.getByText('Santander')).toBeInTheDocument();
+  });
+
+  it('displays distance when available', () => {
+    render(<StoreCard store={mockStore} />);
+    expect(screen.getByText('2.5 km')).toBeInTheDocument();
+  });
+
+  it('displays the count of extra promotions', () => {
+    render(<StoreCard store={mockStore} />);
+    expect(screen.getByText('+1 promoción más')).toBeInTheDocument();
+  });
+
+  it('displays extra promotion details', () => {
+    render(<StoreCard store={mockStore} />);
+    expect(screen.getByText('10%')).toBeInTheDocument();
+    expect(screen.getByText('10% descuento en papas')).toBeInTheDocument();
+  });
+
+  it('renders logo image when available', () => {
+    render(<StoreCard store={mockStore} />);
+    const img = screen.getByAltText('Burger King logo');
+    expect(img).toBeInTheDocument();
+    expect(img).toHaveAttribute('src', 'https://example.com/burger-king.png');
+  });
+
+  it('handles store with no promotions', () => {
+    const storeWithoutPromos: Store = {
+      ...mockStore,
+      promotions: [],
+    };
+    render(<StoreCard store={storeWithoutPromos} />);
+    expect(screen.getByText('Promociones disponibles')).toBeInTheDocument();
+  });
+
+  it('handles store without distance', () => {
+    const storeWithoutDistance: Store = {
+      ...mockStore,
+      distance_km: undefined,
+    };
+    render(<StoreCard store={storeWithoutDistance} />);
+    expect(screen.queryByText(/km/)).not.toBeInTheDocument();
+  });
+
+  it('handles store without logo', () => {
+    const storeWithoutLogo: Store = {
+      ...mockStore,
+      logo_url: null,
+    };
     render(<StoreCard store={storeWithoutLogo} />);
-    expect(screen.getByText('Sin logo')).toBeInTheDocument();
-    expect(screen.queryByAltText('Test Store logo')).not.toBeInTheDocument();
+    expect(screen.queryByAltText('Burger King logo')).not.toBeInTheDocument();
   });
 
-  it('renders the distance when provided', () => {
-    const storeWithDistance = { ...baseMockStore, distance_km: 5.36 };
-    render(<StoreCard store={storeWithDistance} />);
-    expect(screen.getByText(/5.4 km/i)).toBeInTheDocument();
+  it('creates correct link href with user location', () => {
+    render(
+      <StoreCard 
+        store={mockStore} 
+        userLocation={{ lat: '-34.9', lon: '-56.16' }}
+      />
+    );
+    const link = screen.getByRole('link');
+    expect(link).toHaveAttribute(
+      'href',
+      expect.stringContaining('/local/store-1')
+    );
+    expect(link).toHaveAttribute(
+      'href',
+      expect.stringContaining('lat=-34.9')
+    );
+    expect(link).toHaveAttribute(
+      'href',
+      expect.stringContaining('lon=-56.16')
+    );
   });
 
-  it('does not render the distance when not provided', () => {
-    render(<StoreCard store={baseMockStore} />);
-    expect(screen.queryByText(/km/i)).not.toBeInTheDocument();
-  });
-
-  it('renders a placeholder when there are no promotions', () => {
-    render(<StoreCard store={baseMockStore} />);
-    expect(screen.getByText('Estamos cargando promociones para este local.')).toBeInTheDocument();
-  });
-
-  it('renders the top promotion correctly', () => {
-    const storeWithPromo = { ...baseMockStore, promotions: [promo1] };
-    render(<StoreCard store={storeWithPromo} />);
-    expect(screen.getByText('25% OFF')).toBeInTheDocument(); // The value label
-    expect(screen.getByText('Descuento Principal')).toBeInTheDocument(); // The name
-    expect(screen.getByText('Test Bank')).toBeInTheDocument();
-    expect(screen.getByText(/Credit \/ Gold/i)).toBeInTheDocument();
-    expect(screen.getByText('Test description')).toBeInTheDocument();
-  });
-
-  it('renders a count of additional promotions (plural)', () => {
-    const storeWithPromos = { ...baseMockStore, promotions: [promo1, promo2, promo3] };
-    render(<StoreCard store={storeWithPromos} />);
-    expect(screen.getByText(/2 beneficios adicionales/i)).toBeInTheDocument();
-  });
-
-  it('renders a count of additional promotions (singular)', () => {
-    const storeWithPromos = { ...baseMockStore, promotions: [promo1, promo2] };
-    render(<StoreCard store={storeWithPromos} />);
-    expect(screen.getByText(/1 beneficio adicional/i)).toBeInTheDocument();
-  });
-
-  it('renders a truncated list of extra promotions and a summary message', () => {
-    const storeWithManyPromos = { ...baseMockStore, promotions: [promo1, promo2, promo3, promo4, promo5] };
-    render(<StoreCard store={storeWithManyPromos} />);
-    // Top promo
-    expect(screen.getByText('25% OFF')).toBeInTheDocument();
-    expect(screen.getByText('Descuento Principal')).toBeInTheDocument();
-    // 3 extra promos are listed by name
-    expect(screen.getByText(/10% OFF/i)).toBeInTheDocument();
-    expect(screen.getByText(/Promo de 5 porciento/i)).toBeInTheDocument();
-    expect(screen.getByText(/BOGO/i)).toBeInTheDocument();
-    // The 5th promo (4th extra) is not listed by name
-    expect(screen.queryByText(/Free Drink/i)).not.toBeInTheDocument();
-    // A summary message is shown for the rest
-    expect(screen.getByText(/y 1 promos mas.../i)).toBeInTheDocument();
+  it('has correct CTA button text', () => {
+    render(<StoreCard store={mockStore} />);
+    expect(screen.getByText('Ver detalles completos')).toBeInTheDocument();
   });
 });

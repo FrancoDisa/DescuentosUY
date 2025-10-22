@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api
+
+Sitemap: https://descuentosuy.vercel.app/sitemap.xml
+
+# Crawl delay
+Crawl-delay: 1

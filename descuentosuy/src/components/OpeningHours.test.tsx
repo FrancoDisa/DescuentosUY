@@ -1,86 +1,144 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { OpeningHours } from './OpeningHours';
 
-const mockOpeningHours = {
-  open_now: true,
-  weekday_text: [
-    'Monday: 9:00 AM – 5:00 PM',
-    'Tuesday: 9:00 AM – 5:00 PM',
-    'Wednesday: 9:00 AM – 5:00 PM',
-    'Thursday: 9:00 AM – 5:00 PM',
-    'Friday: 9:00 AM – 8:00 PM',
-    'Saturday: 10:00 AM – 6:00 PM',
-    'Sunday: Closed',
-  ],
-};
-
-describe.skip('OpeningHours', () => {
-  beforeEach(() => {
-    // Mock Date to control which day of the week it is. Sunday = 0, Monday = 1, etc.
-    // We will set it to a Wednesday (3)
-    const mockDate = new Date('2025-09-24T12:00:00Z'); // This is a Wednesday
-    vi.spyOn(global, 'Date').mockImplementation(() => mockDate);
+describe('OpeningHours', () => {
+  beforeAll(() => {
+    // Mock the date to control day of week
+    vi.useFakeTimers();
   });
 
-  afterEach(() => {
-    vi.restoreAllMocks();
+  afterAll(() => {
+    vi.useRealTimers();
   });
 
-  it('renders nothing if openingHours prop is null', () => {
+  const mockOpeningHours = {
+    open_now: true,
+    weekday_text: [
+      'Monday: 09:00 – 22:00',
+      'Tuesday: 09:00 – 22:00',
+      'Wednesday: 09:00 – 22:00',
+      'Thursday: 09:00 – 22:00',
+      'Friday: 09:00 – 23:00',
+      'Saturday: 10:00 – 23:00',
+      'Sunday: 10:00 – 21:00',
+    ],
+  };
+
+  const mockClosedHours = {
+    open_now: false,
+    weekday_text: [
+      'Monday: 09:00 – 22:00',
+      'Tuesday: 09:00 – 22:00',
+      'Wednesday: 09:00 – 22:00',
+      'Thursday: 09:00 – 22:00',
+      'Friday: 09:00 – 23:00',
+      'Saturday: 10:00 – 23:00',
+      'Sunday: Closed',
+    ],
+  };
+
+  it('returns null when opening hours data is not provided', () => {
     const { container } = render(<OpeningHours openingHours={null} />);
     expect(container.firstChild).toBeNull();
   });
 
-  it('renders nothing if weekday_text is missing', () => {
+  it('returns null when weekday_text is not provided', () => {
     const { container } = render(<OpeningHours openingHours={{ open_now: true }} />);
     expect(container.firstChild).toBeNull();
   });
 
-  it('displays "Abierto ahora" when open_now is true', () => {
+  it('shows "Abierto ahora" status when open_now is true', () => {
     render(<OpeningHours openingHours={mockOpeningHours} />);
     expect(screen.getByText('Abierto ahora')).toBeInTheDocument();
   });
 
-  it('displays "Cerrado ahora" when open_now is false', () => {
-    const closedHours = { ...mockOpeningHours, open_now: false };
-    render(<OpeningHours openingHours={closedHours} />);
+  it('shows "Cerrado ahora" status when open_now is false', () => {
+    render(<OpeningHours openingHours={mockClosedHours} />);
     expect(screen.getByText('Cerrado ahora')).toBeInTheDocument();
   });
 
-  it('displays the hours for the current day (Wednesday)', () => {
+  it('displays correct styling for open status', () => {
     render(<OpeningHours openingHours={mockOpeningHours} />);
-    // The component should identify Wednesday's hours
-    expect(screen.getByText('9:00 AM – 5:00 PM')).toBeInTheDocument();
+    const statusBadge = screen.getByText('Abierto ahora');
+    expect(statusBadge).toHaveClass('bg-green-100');
+    expect(statusBadge).toHaveClass('text-green-800');
   });
 
-  it('toggles the visibility of the full week schedule on click', () => {
+  it('displays correct styling for closed status', () => {
+    render(<OpeningHours openingHours={mockClosedHours} />);
+    const statusBadge = screen.getByText('Cerrado ahora');
+    expect(statusBadge).toHaveClass('bg-red-100');
+    expect(statusBadge).toHaveClass('text-red-800');
+  });
+
+  it('is not expanded initially', () => {
     render(<OpeningHours openingHours={mockOpeningHours} />);
+    expect(screen.queryByText('Lunes:')).not.toBeInTheDocument();
+  });
 
-    // Initially, the full schedule should not be visible
+  it('expands when clicked', () => {
+    render(<OpeningHours openingHours={mockOpeningHours} />);
+    const expandButton = screen.getByText('Abierto ahora').closest('div');
+    
+    fireEvent.click(expandButton!);
+    
+    expect(screen.getByText(/Lunes:/)).toBeInTheDocument();
+  });
+
+  it('collapses when clicked again', () => {
+    render(<OpeningHours openingHours={mockOpeningHours} />);
+    const expandButton = screen.getByText('Abierto ahora').closest('div');
+    
+    // Expand
+    fireEvent.click(expandButton!);
+    expect(screen.getByText(/Lunes:/)).toBeInTheDocument();
+    
+    // Collapse
+    fireEvent.click(expandButton!);
     expect(screen.queryByText(/Lunes:/)).not.toBeInTheDocument();
+  });
 
-    // Click to expand
-    const toggleButton = screen.getByText('Abierto ahora').parentElement;
-    expect(toggleButton).not.toBeNull();
-    fireEvent.click(toggleButton!);
+  it('translates day names to Spanish', () => {
+    render(<OpeningHours openingHours={mockOpeningHours} />);
+    const expandButton = screen.getByText('Abierto ahora').closest('div');
+    
+    fireEvent.click(expandButton!);
+    
+    expect(screen.getByText(/Lunes:/)).toBeInTheDocument();
+    expect(screen.getByText(/Martes:/)).toBeInTheDocument();
+    expect(screen.getByText(/Miércoles:/)).toBeInTheDocument();
+    expect(screen.getByText(/Jueves:/)).toBeInTheDocument();
+    expect(screen.getByText(/Viernes:/)).toBeInTheDocument();
+    expect(screen.getByText(/Sábado:/)).toBeInTheDocument();
+    expect(screen.getByText(/Domingo:/)).toBeInTheDocument();
+  });
 
-    // Now, the full schedule should be visible
-    expect(screen.getByText(/Lunes: 9:00 AM – 5:00 PM/)).toBeInTheDocument();
+  it('translates Closed status to Cerrado', () => {
+    render(<OpeningHours openingHours={mockClosedHours} />);
+    const expandButton = screen.getByText('Cerrado ahora').closest('div');
+    
+    fireEvent.click(expandButton!);
+    
     expect(screen.getByText(/Domingo: Cerrado/)).toBeInTheDocument();
-
-    // Click again to collapse
-    fireEvent.click(toggleButton!);
-    expect(screen.queryByText(/Lunes:/)).not.toBeInTheDocument();
   });
 
-  it('translates the weekday names to Spanish', () => {
+  it('highlights today\'s hours', () => {
     render(<OpeningHours openingHours={mockOpeningHours} />);
-    const toggleButton = screen.getByText('Abierto ahora').parentElement;
-    fireEvent.click(toggleButton!);
+    const expandButton = screen.getByText('Abierto ahora').closest('div');
+    
+    fireEvent.click(expandButton!);
+    
+    // Find today's item and check if it has bold styling
+    const todayItem = Array.from(screen.getAllByText(/:/)).find(el => {
+      return el.className?.includes('font-bold');
+    });
+    
+    expect(todayItem).toBeTruthy();
+  });
 
-    // Check for translated day names
-    expect(screen.getByText(/Miércoles: 9:00 AM – 5:00 PM/)).toBeInTheDocument();
-    expect(screen.queryByText(/Wednesday:/)).not.toBeInTheDocument();
+  it('displays chevron icon', () => {
+    render(<OpeningHours openingHours={mockOpeningHours} />);
+    expect(screen.getByText('▼')).toBeInTheDocument();
   });
 });
