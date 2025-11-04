@@ -2,14 +2,12 @@ import { Suspense } from 'react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { StoreDetail, Store } from '@/components/StoreDetail';
-import { createClient } from "@/utils/supabase/server";
-import { cookies } from "next/headers";
+import { createPublicClient } from "@/utils/supabase/server";
 import { notFound } from 'next/navigation';
 
 // La página es ahora el Server Component que se encarga de buscar los datos
 async function StoreDataFetcher({ storeId }: { storeId: string }) {
-  const cookieStore = cookies();
-  const supabase = createClient(cookieStore);
+  const supabase = createPublicClient();
 
   const { data: store, error } = await supabase
     .from('stores')
@@ -33,8 +31,7 @@ export async function generateMetadata(
   { params }: { params: Promise<{ id: string }> }
 ): Promise<Metadata> {
   const { id: storeId } = await params;
-  const cookieStore = cookies();
-  const supabase = createClient(cookieStore);
+  const supabase = createPublicClient();
 
   const { data: store } = await supabase
     .from('stores')

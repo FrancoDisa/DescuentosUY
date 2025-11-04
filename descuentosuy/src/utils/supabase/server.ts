@@ -1,5 +1,4 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
-import { createClient as createJSClient } from '@supabase/supabase-js'; // Importamos el cliente JS estándar
 import { cookies } from 'next/headers';
 
 // Este cliente es para rutas y operaciones autenticadas, usando la librería SSR
@@ -39,11 +38,22 @@ export function createClient(cookieStore: ReturnType<typeof cookies>) {
 }
 
 // Esta función es para acceso público y anónimo en el servidor.
-// Usa el cliente JS estándar para evitar problemas con SSR/cookies,
-// lo que permite su uso en páginas que también usan searchParams.
+// Usa createServerClient siguiendo el patrón oficial de @supabase/ssr
+// con una configuración de cookies vacía para operaciones públicas sin sesión.
+// Esto permite su uso en páginas que también usan searchParams sin problemas de hidratación.
 export function createPublicClient() {
-  return createJSClient(
+  return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return [];
+        },
+        setAll() {
+          // No hacer nada para operaciones públicas sin autenticación
+        },
+      },
+    }
   );
 }

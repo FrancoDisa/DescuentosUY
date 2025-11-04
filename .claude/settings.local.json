@@ -1,9 +1,21 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "mcp__supabase__list_tables",
+      "mcp__supabase__list_extensions",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs",
+      "mcp__supabase__get_advisors",
+      "mcp__supabase__search_docs",
+      "Bash(mkdir:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "context7",
     "chrome-devtools",
     "github",
     "supabase"
-  ],
-  "enableAllProjectMcpServers": true
+  ]
 }
