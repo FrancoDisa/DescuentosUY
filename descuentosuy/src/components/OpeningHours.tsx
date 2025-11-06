@@ -51,19 +51,21 @@ export function OpeningHours({ openingHours }: Props) {
 
   return (
     <div className="mt-2 text-sm">
-      <div 
-        className="cursor-pointer flex items-center" 
+      <button
+        type="button"
+        className="w-full cursor-pointer flex items-center text-left"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
+        aria-label={isOpen ? 'Ocultar horarios' : 'Mostrar horarios'}
       >
         <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusColor}`}>
           {statusText}
         </span>
         <span className="ml-2 text-gray-600">{todaysHours.replace('Closed', 'Cerrado')}</span>
-        <span className={`ml-2 text-gray-400 transform transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
+        <span className={`ml-2 text-gray-400 transform transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} aria-hidden="true">
           ▼
         </span>
-      </div>
+      </button>
 
       {isOpen && (
         <ul className="mt-2 list-none pl-0 text-gray-600 space-y-1">

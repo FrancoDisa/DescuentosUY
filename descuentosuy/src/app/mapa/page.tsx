@@ -70,9 +70,9 @@ export default async function MapPage({ searchParams }: { searchParams: Promise<
           </div>
         </header>
         <main className="max-w-5xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-          <div className="rounded-2xl border border-red-200 bg-gradient-to-br from-red-50 to-red-100/50 px-6 py-4 text-center shadow-lg">
+          <div className="rounded-2xl border border-red-200 bg-gradient-to-br from-red-50 to-red-100/50 px-6 py-4 text-center shadow-lg" role="alert">
             <p className="font-semibold text-red-900">No pudimos cargar el mapa</p>
-            <p className="mt-1 text-sm text-red-700">{error.message}</p>
+            <p className="mt-1 text-sm text-red-800">{error.message}</p>
           </div>
         </main>
       </div>

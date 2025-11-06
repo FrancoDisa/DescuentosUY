@@ -1,15 +1,6 @@
 ﻿import Image from 'next/image';
 import Link from 'next/link';
-
-export type Promotion = {
-  id: string;
-  name: string;
-  value: number;
-  card_issuer: string;
-  card_type: string;
-  card_tier: string;
-  description: string;
-};
+import type { Promotion } from '@/types/domain';
 
 export type Store = {
   id: string;

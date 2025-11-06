@@ -2,28 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { useMemo } from 'react';
-
-// El tipo de dato que este componente recibe (una sucursal con todos los datos)
-type Promotion = {
-  id: string;
-  name: string;
-  value: number;
-  card_issuer: string;
-};
-
-type Branch = {
-  store_id: string;
-  branch_id: string;
-  store_name: string;
-  branch_name: string;
-  latitude: number | null;
-  longitude: number | null;
-  logo_url?: string | null;
-  distance_km?: number | null;
-  max_discount_value?: number | null;
-  promotions?: Promotion[];
-  address?: string | null;
-};
+import type { BranchWithDetails as Branch } from '@/types/domain';
 
 type MapLoaderProps = {
   stores: Branch[]; // La prop se sigue llamando 'stores' pero contiene sucursales

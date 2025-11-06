@@ -15,30 +15,10 @@ import 'leaflet.markercluster';
 import '@/utils/leafletIconSetup';
 import { defaultLeafletIcon } from '@/utils/leafletIconSetup';
 import { LocationStatus } from '@/components/LocationStatus';
+import type { BranchWithDetails as Branch } from '@/types/domain';
 
-// El tipo de dato que este componente recibe (una sucursal con todos los datos)
-type Promotion = {
-  id: string;
-  name: string;
-  value: number;
-  card_issuer: string;
-  card_type?: string;
-  card_tier?: string;
-};
-
-type Branch = {
-  store_id: string;
-  branch_id: string;
-  store_name: string;
-  branch_name: string;
-  latitude: number | null;
-  longitude: number | null;
-  logo_url?: string | null;
-  address?: string | null;
-  distance_km?: number | null;
-  max_discount_value?: number | null;
-  promotions?: Promotion[];
-};
+// Re-export Branch type for compatibility with existing code
+export type { Branch };
 
 type MapProps = {
   stores: Branch[]; // La prop se sigue llamando 'stores' pero contiene sucursales
@@ -94,8 +74,8 @@ function ClusterManager({ stores, storeMarkerIcon, userQueryParams, userLat, use
     if (!map) return;
 
     // Crear grupo de clustering
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const clusterGroup = (L as any).markerClusterGroup({
+    // @ts-expect-error - markerClusterGroup is added by leaflet.markercluster plugin
+    const clusterGroup = L.markerClusterGroup({
       maxClusterRadius: 80,
       disableClusteringAtZoom: 17,
     });

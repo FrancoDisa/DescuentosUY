@@ -86,7 +86,13 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
   });
 
   if (error) {
-    return <p className="p-8 text-center text-red-500">Error al cargar los datos: {error.message}</p>;
+    return (
+      <div className="p-8 text-center">
+        <p className="rounded-lg bg-red-50 px-6 py-4 text-red-900" role="alert">
+          Error al cargar los datos: {error.message}
+        </p>
+      </div>
+    );
   }
 
   const branches = (data as Branch[] | null) ?? [];
