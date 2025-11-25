@@ -1,7 +1,6 @@
 import path from 'path';
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
-import type { UserConfig } from 'vitest/config';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -17,4 +16,4 @@ export default defineConfig({
       'react': path.resolve(__dirname, './node_modules/react'),
     },
   },
-} satisfies UserConfig);
+});

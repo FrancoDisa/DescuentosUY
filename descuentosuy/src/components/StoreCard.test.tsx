@@ -65,12 +65,12 @@ describe('StoreCard', () => {
 
   it('displays distance when available', () => {
     render(<StoreCard store={mockStore} />);
-    expect(screen.getByText('2.5 km')).toBeInTheDocument();
+    expect(screen.getByText((content) => content.includes('2.5') && content.includes('km de tu'))).toBeInTheDocument();
   });
 
   it('displays the count of extra promotions', () => {
     render(<StoreCard store={mockStore} />);
-    expect(screen.getByText('+1 promoción más')).toBeInTheDocument();
+    expect(screen.getByText('+1 promo adicionales')).toBeInTheDocument();
   });
 
   it('displays extra promotion details', () => {
@@ -137,6 +137,6 @@ describe('StoreCard', () => {
 
   it('has correct CTA button text', () => {
     render(<StoreCard store={mockStore} />);
-    expect(screen.getByText('Ver detalles completos')).toBeInTheDocument();
+    expect(screen.getByText('Ver detalle')).toBeInTheDocument();
   });
 });

@@ -64,17 +64,29 @@ export async function generateMetadata(
 
 export default async function StoreDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: storeId } = await params;
-  
+
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <header className="bg-white shadow-sm">
-        <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <Link href="/?" className="text-purple-600 hover:text-purple-800 mb-4 block">&larr; Volver a todos los locales</Link>
-          
-          <Suspense fallback={<div className="h-24"><p className="text-lg">Cargando detalles del local...</p></div>}>
-            <StoreDataFetcher storeId={storeId} />
-          </Suspense>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-brand-50/20 to-secondary-50/20">
+      <header className="surface-card mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8 card-glow-blue border-2 border-brand-200/40 animate-fade-in-up">
+        <Link
+          href="/?"
+          className="mb-6 inline-flex items-center gap-2 rounded-2xl border-2 border-brand-200/50 bg-gradient-to-r from-white to-brand-50/30 px-5 py-2.5 font-semibold text-brand-700 shadow-md transition-all hover:border-brand-400 hover:shadow-lg hover:-translate-x-1 group"
+        >
+          <span className="transition-transform group-hover:-translate-x-1">←</span>
+          Volver a todos los locales
+        </Link>
+
+        <Suspense fallback={
+          <div className="flex items-center gap-4 rounded-2xl border-2 border-secondary-200/50 bg-gradient-to-br from-white to-secondary-50/30 p-8">
+            <div className="h-16 w-16 animate-pulse rounded-2xl bg-gradient-to-br from-brand-200 to-secondary-200"></div>
+            <div className="flex-1 space-y-3">
+              <div className="h-8 w-3/4 animate-pulse rounded-lg bg-gradient-to-r from-brand-200 to-secondary-200"></div>
+              <div className="h-4 w-1/2 animate-pulse rounded-lg bg-gradient-to-r from-secondary-200 to-brand-200"></div>
+            </div>
+          </div>
+        }>
+          <StoreDataFetcher storeId={storeId} />
+        </Suspense>
       </header>
     </div>
   );

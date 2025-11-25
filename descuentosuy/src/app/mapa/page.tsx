@@ -1,40 +1,22 @@
-﻿import Link from 'next/link';
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { LocationHandler } from '@/components/LocationHandler';
 import { MapLoader } from '@/components/MapLoader';
+import { StoreList } from '@/components/StoreList';
 import { createPublicClient } from '@/utils/supabase/server';
+import { HomeSearch } from '@/components/home';
+import type { BranchWithDetails, Promotion } from '@/types/domain';
+import type { Store } from '@/components/StoreCard';
+import { MapPin, List, Filter, ArrowLeft } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Mapa de Descuentos - DescuentosUY',
-  description: 'Explora el mapa interactivo de descuentos en Montevideo. Encuentra locales con promociones cerca tuyo.',
+  title: 'Explorar Descuentos - DescuentosUY',
+  description: 'Busca, filtra y encuentra los mejores descuentos en Montevideo. Mapa interactivo y lista completa de locales con promociones.',
   openGraph: {
-    title: 'Mapa de Descuentos - DescuentosUY',
-    description: 'Explora descuentos en un mapa interactivo',
+    title: 'Explorar Descuentos - DescuentosUY',
+    description: 'Busca y encuentra descuentos en Montevideo',
     type: 'website',
   },
-};
-
-type Promotion = {
-  id: string;
-  name: string;
-  value: number;
-  card_issuer: string;
-  card_type?: string;
-  card_tier?: string;
-};
-
-type Branch = {
-  store_id: string;
-  branch_id: string;
-  store_name: string;
-  branch_name: string;
-  logo_url: string | null;
-  promotions: Promotion[];
-  max_discount_value: number | null;
-  distance_km: number | null;
-  latitude: number | null;
-  longitude: number | null;
-  address?: string | null;
 };
 
 type SearchParams = {
@@ -45,6 +27,16 @@ type SearchParams = {
 };
 
 export const dynamic = 'force-dynamic';
+
+function getMaxPromotionValue(promotions: Promotion[]): number {
+  if (!promotions || promotions.length === 0) {
+    return 0;
+  }
+  return promotions.reduce((acc, promo) => {
+    const value = typeof promo.value === 'number' ? promo.value : 0;
+    return value > acc ? value : acc;
+  }, 0);
+}
 
 export default async function MapPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const { query, sort, lat, lon } = await searchParams;
@@ -59,85 +51,91 @@ export default async function MapPage({ searchParams }: { searchParams: Promise<
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-brand-50/20">
-        <header className="border-b border-brand-100/50 bg-white/80 shadow-sm shadow-brand-500/5 backdrop-blur-xl">
-          <div className="max-w-5xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            <Link href="/?" className="group inline-flex items-center gap-1 text-brand-600 font-semibold transition-colors hover:text-brand-700">
-              <span className="transition-transform group-hover:-translate-x-1">&larr;</span>
-              Volver al inicio
-            </Link>
-            <h1 className="mt-2 text-3xl font-bold text-gray-900">Mapa de descuentos</h1>
+      <div className="flex min-h-[50vh] items-center justify-center px-4">
+        <div className="rounded-xl border border-red-200 bg-red-50/50 px-8 py-10 text-center shadow-sm">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-600">
+            <MapPin className="h-6 w-6" />
           </div>
-        </header>
-        <main className="max-w-5xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-          <div className="rounded-2xl border border-red-200 bg-gradient-to-br from-red-50 to-red-100/50 px-6 py-4 text-center shadow-lg" role="alert">
-            <p className="font-semibold text-red-900">No pudimos cargar el mapa</p>
-            <p className="mt-1 text-sm text-red-800">{error.message}</p>
-          </div>
-        </main>
+          <p className="text-lg font-semibold text-red-900">No pudimos cargar el mapa</p>
+          <p className="mt-2 text-sm text-red-600">{error.message}</p>
+        </div>
       </div>
     );
   }
 
-  const branches = (data as Branch[] | null) ?? [];
-
-  const listParams = new URLSearchParams();
-  if (query) {
-    listParams.set('query', query);
+  const branches = (data as BranchWithDetails[] | null) ?? [];
+  const uniqueStoresMap = new Map<string, Store>();
+  for (const branch of branches) {
+    const existing = uniqueStoresMap.get(branch.store_id);
+    const branchDistance = branch.distance_km;
+    const existingDistance = existing?.distance_km;
+    if (
+      !existing ||
+      (branchDistance != null && existingDistance == null) ||
+      (branchDistance != null && existingDistance != null && branchDistance < existingDistance)
+    ) {
+      uniqueStoresMap.set(branch.store_id, {
+        id: branch.store_id,
+        branch_id: branch.branch_id,
+        name: branch.store_name,
+        logo_url: branch.logo_url,
+        promotions: branch.promotions,
+        distance_km: branch.distance_km ?? undefined,
+      });
+    }
   }
-  if (sort) {
-    listParams.set('sort', sort);
-  }
-  if (lat) {
-    listParams.set('lat', lat);
-  }
-  if (lon) {
-    listParams.set('lon', lon);
-  }
-  const listHref = listParams.size > 0 ? `/?${listParams.toString()}` : '/?';
+  const uniqueStores = Array.from(uniqueStoresMap.values());
+  const userLocation = lat || lon ? { lat, lon } : undefined;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-brand-50/20">
+    <div className="flex h-[calc(100vh-5rem)] flex-col lg:flex-row overflow-hidden bg-background">
       <LocationHandler />
-      <header className="border-b border-brand-100/50 bg-white/80 shadow-sm shadow-brand-500/5 backdrop-blur-xl">
-        <div className="max-w-5xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <Link href="/?" className="group inline-flex items-center gap-1 text-brand-600 font-semibold transition-colors hover:text-brand-700">
-            <span className="transition-transform group-hover:-translate-x-1">&larr;</span>
-            Volver al inicio
-          </Link>
-          <div className="mt-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 lg:text-4xl">Mapa de descuentos</h1>
-              <p className="text-base text-gray-600">Explora sucursales cercanas y afina tu ubicación en tiempo real.</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Link
-                href={listHref}
-                className="inline-flex items-center justify-center gap-1.5 rounded-full border border-brand-200 bg-gradient-to-r from-brand-50 to-accent-50 px-4 py-2 text-sm font-semibold text-brand-700 shadow-sm transition-all duration-300 hover:border-brand-300 hover:shadow-md hover:shadow-brand-500/20"
-              >
-                Ver lista de locales
-              </Link>
-              <Link
-                href="/admin/cargar"
-                className="inline-flex items-center justify-center gap-1.5 rounded-full border border-gray-300 bg-gray-50 px-4 py-2 text-xs font-semibold text-gray-700 shadow-sm transition-all duration-300 hover:border-gray-400 hover:shadow-md"
-                title="Panel de administración"
-              >
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                Admin
-              </Link>
+
+      {/* Sidebar / List View */}
+      <div className="flex w-full flex-col border-r border-border bg-background lg:w-[450px] xl:w-[500px] shrink-0">
+        <div className="flex-none border-b border-border p-4 lg:p-6 space-y-4 bg-background/80 backdrop-blur-sm z-10">
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
+              <MapPin className="h-5 w-5 text-primary" />
+              Explorar Mapa
+            </h1>
+            <div className="text-xs font-medium text-muted-foreground bg-muted/50 px-2.5 py-1 rounded-full">
+              {uniqueStores.length} locales
             </div>
           </div>
-        </div>
-      </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-10 sm:px-6 lg:px-8">
-        <div className="overflow-hidden rounded-2xl border border-brand-100/50 bg-white shadow-2xl shadow-brand-500/10">
-          <MapLoader stores={branches} height="75vh" />
+          <HomeSearch
+            query={query}
+            sort={sort}
+            variant="compact"
+            title=""
+            description=""
+          />
         </div>
-      </main>
+
+        <div className="flex-1 overflow-y-auto p-4 lg:p-6 bg-muted/5">
+          <div className="space-y-6">
+            {uniqueStores.length > 0 ? (
+              <div className="grid grid-cols-1 gap-4">
+                <StoreList stores={uniqueStores} query={query} userLocation={userLocation} />
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground">
+                <div className="bg-muted/50 p-4 rounded-full mb-4">
+                  <Filter className="h-8 w-8 text-muted-foreground/50" />
+                </div>
+                <p className="font-medium">No se encontraron locales</p>
+                <p className="text-sm mt-1">Probá ajustando los filtros de búsqueda</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Map View */}
+      <div className="relative flex-1 bg-muted/10 h-[50vh] lg:h-auto w-full">
+        <MapLoader stores={branches} height="100%" />
+      </div>
     </div>
   );
 }

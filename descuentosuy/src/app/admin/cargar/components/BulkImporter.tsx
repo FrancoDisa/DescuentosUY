@@ -17,6 +17,11 @@ type GoogleBranch = {
   };
 };
 
+type CsvRow = {
+  storeName?: string;
+  storename?: string;
+};
+
 type Props = {
   promotions: Promotion[];
   onImportComplete: () => void;
@@ -50,7 +55,7 @@ export function BulkImporter({ promotions, onImportComplete }: Props) {
 
     setCsvFile(file);
 
-    Papa.parse<{ storeName: string }>(file, {
+    Papa.parse<CsvRow>(file, {
       header: true,
       skipEmptyLines: true,
       transformHeader: (header) => {
@@ -240,7 +245,7 @@ export function BulkImporter({ promotions, onImportComplete }: Props) {
           type="file"
           accept=".csv"
           onChange={handleFileChange}
-          className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 file:bg-brand-50 file:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
           aria-label="Seleccionar archivo CSV"
         />
         {csvFile && (

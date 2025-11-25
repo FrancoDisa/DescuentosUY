@@ -57,11 +57,11 @@ export type BranchWithDetails = {
   branch_name: string;
   logo_url: string | null;
   promotions: Promotion[];
-  max_discount_value: number;
+  max_discount_value: number | null;
   distance_km: number | null;
   latitude: number;
   longitude: number;
-  address: string;
+  address: string | null;
 };
 
 /**

@@ -1,6 +1,7 @@
-﻿import Image from 'next/image';
+import Image from 'next/image';
 import Link from 'next/link';
 import type { Promotion } from '@/types/domain';
+import { MapPin, ArrowRight, Tag } from 'lucide-react';
 
 export type Store = {
   id: string;
@@ -14,6 +15,7 @@ export type Store = {
 export type UserLocation = {
   lat?: string;
   lon?: string;
+  address?: string;
 };
 
 type StoreCardProps = {
@@ -34,92 +36,102 @@ export function StoreCard({ store, userLocation }: StoreCardProps) {
 
   const href = queryParams.size > 0 ? `/local/${store.id}?${queryParams.toString()}` : `/local/${store.id}`;
   const topPromotion = store.promotions?.[0];
-  const extraPromotions = store.promotions?.slice(1) ?? [];
-  const promoValueLabel = typeof topPromotion?.value === 'number' ? `${Math.round(topPromotion.value)}%` : null;
+  const additionalPromos = store.promotions?.slice(1) ?? [];
+  const topValue = typeof topPromotion?.value === 'number' ? Math.round(topPromotion.value) : null;
   const promoMeta = topPromotion ? [topPromotion.card_type, topPromotion.card_tier].filter(Boolean).join(' · ') : '';
 
   return (
-    <Link href={href} className="block h-full">
-      <article className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-white transition-all duration-200 hover:border-brand-300 hover:shadow-lg">
-        {/* Discount Hero Section */}
-        {topPromotion && promoValueLabel ? (
-          <div className="relative border-b border-gray-100 bg-gradient-to-br from-accent-500 to-accent-600 px-6 py-8 text-center">
-            <div className="space-y-2">
-              <div className="text-6xl font-black text-white">{promoValueLabel}</div>
-              <div className="text-sm font-semibold uppercase tracking-wide text-white/90">DE DESCUENTO</div>
-            </div>
-          </div>
-        ) : (
-          <div className="border-b border-gray-100 bg-gray-50 px-6 py-8 text-center">
-            <div className="text-sm text-gray-500">Promociones disponibles</div>
-          </div>
-        )}
-
-        {/* Store Info */}
-        <div className="flex flex-1 flex-col gap-4 p-6">
-          <div className="flex items-start gap-3">
-            {store.logo_url && (
-              <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-white">
-                <Image
-                  src={store.logo_url}
-                  alt={`${store.name} logo`}
-                  fill
-                  sizes="48px"
-                  className="object-contain p-1.5"
-                />
-              </div>
-            )}
-            <div className="flex-1 space-y-1">
-              <h3 className="text-lg font-bold text-gray-900">{store.name}</h3>
-              {topPromotion?.card_issuer && (
-                <p className="text-xs font-semibold uppercase tracking-wide text-brand-600">{topPromotion.card_issuer}</p>
+    <Link href={href} className="group block h-full">
+      <article className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-primary/30">
+        <div className="p-5 flex flex-col gap-4 flex-1">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-3">
+              {store.logo_url ? (
+                <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-xl border border-border bg-white p-1">
+                  <Image
+                    src={store.logo_url}
+                    alt={`${store.name} logo`}
+                    fill
+                    sizes="48px"
+                    className="object-contain"
+                  />
+                </div>
+              ) : (
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl border border-dashed border-border bg-secondary text-xs font-medium text-muted-foreground">
+                  Logo
+                </div>
               )}
+              <div>
+                <h3 className="font-heading font-semibold text-foreground line-clamp-1 group-hover:text-primary transition-colors">
+                  {store.name}
+                </h3>
+                {topPromotion?.card_issuer && (
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {topPromotion.card_issuer}
+                  </p>
+                )}
+              </div>
             </div>
-            {store.distance_km != null && (
-              <div className="flex items-center gap-1 text-xs text-gray-500">
-                <svg aria-hidden xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
-                  <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                </svg>
-                <span className="font-medium">{store.distance_km.toFixed(1)} km</span>
+
+            {topValue !== null && (
+              <div className="flex flex-col items-end">
+                <span className="text-2xl font-bold text-primary leading-none">
+                  {topValue}%
+                </span>
+                <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
+                  Ahorro
+                </span>
               </div>
             )}
           </div>
 
-          {/* Top Promotion Details */}
           {topPromotion && (
-            <div className="space-y-2 border-t border-gray-100 pt-4">
-              <p className="text-sm font-semibold text-gray-900">{topPromotion.name}</p>
-              {promoMeta && <p className="text-xs text-gray-500">{promoMeta}</p>}
-              {topPromotion.description && (
-                <p className="text-xs leading-relaxed text-gray-600">{topPromotion.description}</p>
-              )}
+            <div className="space-y-2">
+              <div className="flex items-start gap-2">
+                <Tag className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-foreground leading-snug line-clamp-2">
+                    {topPromotion.name}
+                  </p>
+                  {promoMeta && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {promoMeta}
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
           )}
 
-          {/* Extra Promotions */}
-          {extraPromotions.length > 0 && (
-            <div className="space-y-2 border-t border-gray-100 pt-4">
-              <p className="text-xs font-semibold text-gray-500">
-                +{extraPromotions.length} promoción{extraPromotions.length > 1 ? 'es' : ''} más
+          {!topPromotion && (
+            <div className="rounded-lg bg-secondary/50 p-3 text-center text-sm text-muted-foreground">
+              Ver promociones disponibles
+            </div>
+          )}
+
+          {additionalPromos.length > 0 && (
+            <div className="mt-auto pt-3 border-t border-border/50">
+              <p className="text-xs text-muted-foreground font-medium">
+                +{additionalPromos.length} beneficio{additionalPromos.length > 1 ? 's' : ''} más
               </p>
-              <ul className="space-y-1.5">
-                {extraPromotions.slice(0, 2).map((promo) => (
-                  <li key={promo.id} className="flex items-baseline gap-2 text-xs text-gray-600">
-                    <span className="font-bold text-accent-600">{Math.round(promo.value)}%</span>
-                    <span className="line-clamp-1">{promo.name}</span>
-                  </li>
-                ))}
-              </ul>
             </div>
           )}
         </div>
 
-        {/* CTA Footer */}
-        <div className="border-t border-gray-100 bg-gray-50 px-6 py-3 text-center text-sm font-semibold text-brand-600 transition-colors group-hover:bg-brand-50">
-          Ver detalles completos
+        <div className="bg-secondary/30 px-5 py-3 border-t border-border flex items-center justify-between text-xs font-medium text-muted-foreground group-hover:bg-secondary/50 transition-colors">
+          <div className="flex items-center gap-1.5">
+            {store.distance_km != null && (
+              <>
+                <MapPin className="w-3.5 h-3.5" />
+                <span>{store.distance_km.toFixed(1)} km</span>
+              </>
+            )}
+          </div>
+          <div className="flex items-center gap-1 text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+            Ver detalle <ArrowRight className="w-3.5 h-3.5" />
+          </div>
         </div>
       </article>
     </Link>
   );
 }
-

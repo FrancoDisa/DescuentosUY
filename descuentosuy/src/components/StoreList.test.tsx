@@ -56,7 +56,9 @@ describe('StoreList', () => {
 
   it('renders empty state when no stores provided', () => {
     render(<StoreList stores={[]} />);
-    expect(screen.getByText('No hay locales para mostrar.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Todavía no hay locales para mostrar en esta vista.')
+    ).toBeInTheDocument();
   });
 
   it('renders all stores when provided', () => {
@@ -81,8 +83,12 @@ describe('StoreList', () => {
 
   it('displays distance for each store', () => {
     render(<StoreList stores={mockStores} />);
-    expect(screen.getByText('1.2 km')).toBeInTheDocument();
-    expect(screen.getByText('2.5 km')).toBeInTheDocument();
+    expect(
+      screen.getByText((content) => content.includes('1.2') && content.includes('km de tu'))
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText((content) => content.includes('2.5') && content.includes('km de tu'))
+    ).toBeInTheDocument();
   });
 
   it('passes user location to store cards', () => {

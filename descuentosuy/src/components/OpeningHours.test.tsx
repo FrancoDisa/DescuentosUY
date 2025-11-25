@@ -79,31 +79,31 @@ describe('OpeningHours', () => {
 
   it('expands when clicked', () => {
     render(<OpeningHours openingHours={mockOpeningHours} />);
-    const expandButton = screen.getByText('Abierto ahora').closest('div');
-    
-    fireEvent.click(expandButton!);
+    const toggleButton = screen.getByRole('button', { name: /horarios/i });
+
+    fireEvent.click(toggleButton);
     
     expect(screen.getByText(/Lunes:/)).toBeInTheDocument();
   });
 
   it('collapses when clicked again', () => {
     render(<OpeningHours openingHours={mockOpeningHours} />);
-    const expandButton = screen.getByText('Abierto ahora').closest('div');
-    
+    const toggleButton = screen.getByRole('button', { name: /horarios/i });
+
     // Expand
-    fireEvent.click(expandButton!);
+    fireEvent.click(toggleButton);
     expect(screen.getByText(/Lunes:/)).toBeInTheDocument();
     
     // Collapse
-    fireEvent.click(expandButton!);
+    fireEvent.click(toggleButton);
     expect(screen.queryByText(/Lunes:/)).not.toBeInTheDocument();
   });
 
   it('translates day names to Spanish', () => {
     render(<OpeningHours openingHours={mockOpeningHours} />);
-    const expandButton = screen.getByText('Abierto ahora').closest('div');
-    
-    fireEvent.click(expandButton!);
+    const toggleButton = screen.getByRole('button', { name: /horarios/i });
+
+    fireEvent.click(toggleButton);
     
     expect(screen.getByText(/Lunes:/)).toBeInTheDocument();
     expect(screen.getByText(/Martes:/)).toBeInTheDocument();
@@ -116,18 +116,18 @@ describe('OpeningHours', () => {
 
   it('translates Closed status to Cerrado', () => {
     render(<OpeningHours openingHours={mockClosedHours} />);
-    const expandButton = screen.getByText('Cerrado ahora').closest('div');
-    
-    fireEvent.click(expandButton!);
+    const toggleButton = screen.getByRole('button', { name: /horarios/i });
+
+    fireEvent.click(toggleButton);
     
     expect(screen.getByText(/Domingo: Cerrado/)).toBeInTheDocument();
   });
 
   it('highlights today\'s hours', () => {
     render(<OpeningHours openingHours={mockOpeningHours} />);
-    const expandButton = screen.getByText('Abierto ahora').closest('div');
-    
-    fireEvent.click(expandButton!);
+    const toggleButton = screen.getByRole('button', { name: /horarios/i });
+
+    fireEvent.click(toggleButton);
     
     // Find today's item and check if it has bold styling
     const todayItem = Array.from(screen.getAllByText(/:/)).find(el => {

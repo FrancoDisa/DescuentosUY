@@ -1,11 +1,11 @@
-import { Suspense } from 'react';
 import type { Metadata, Viewport } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { LocationHandler } from '@/components/LocationHandler';
-import { StoreList } from '@/components/StoreList';
 import { createPublicClient } from '@/utils/supabase/server';
-import type { Promotion, Store } from '@/components/StoreCard';
-import { HomeHero, HomeHighlights, HomeBenefits, HomeMapPreview, HomeCTA, FilterChips } from '@/components/home';
+import type { Promotion } from '@/types/domain';
+import { StoreCard, type Store } from '@/components/StoreCard';
+import { HomeHero, HomeSearch, HomeHighlights, HomeBenefits, HomeMapPreview, HomeCTA, FloatingCTA } from '@/components/home';
 
 export const dynamic = 'force-dynamic';
 
@@ -74,9 +74,54 @@ function getMaxPromotionValue(promotions: Promotion[]): number {
 export default async function Home({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const { query, sort, lat, lon } = await searchParams;
 
-  const userLocation = lat || lon ? { lat, lon } : undefined;
-
   const supabase = createPublicClient();
+  const { data: topDiscountsData, error: topDiscountsError } = await supabase.rpc('search_stores', {
+    search_term: '',
+    sort_option: 'discount',
+    user_lat: null,
+    user_lon: null,
+  });
+
+  const topDiscounts: Store[] = [];
+  if (!topDiscountsError && topDiscountsData) {
+    const branches = topDiscountsData as Branch[];
+    const uniqueStoresMap = new Map<string, Store>();
+    for (const branch of branches) {
+      const existing = uniqueStoresMap.get(branch.store_id);
+      const branchDistance = branch.distance_km;
+      const existingDistance = existing?.distance_km;
+      if (
+        !existing ||
+        (branchDistance != null && existingDistance == null) ||
+        (branchDistance != null && existingDistance != null && branchDistance < existingDistance)
+      ) {
+        uniqueStoresMap.set(branch.store_id, {
+          id: branch.store_id,
+          branch_id: branch.branch_id,
+          name: branch.store_name,
+          logo_url: branch.logo_url,
+          promotions: branch.promotions,
+          distance_km: branch.distance_km ?? undefined,
+        });
+      }
+    }
+
+    const storesArray = Array.from(uniqueStoresMap.values());
+    const sortedByDiscount = storesArray
+      .map((store) => {
+        const maxDiscount = store.promotions.reduce((max, promo) => {
+          const value = typeof promo.value === 'number' ? promo.value : 0;
+          return value > max ? value : max;
+        }, 0);
+        return { store, maxDiscount };
+      })
+      .filter(({ maxDiscount }) => maxDiscount > 0)
+      .sort((a, b) => b.maxDiscount - a.maxDiscount)
+      .slice(0, 5)
+      .map(({ store }) => store);
+
+    topDiscounts.push(...sortedByDiscount);
+  }
 
   const { data, error } = await supabase.rpc('search_stores', {
     search_term: query || '',
@@ -87,16 +132,16 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
 
   if (error) {
     return (
-      <div className="p-8 text-center">
-        <p className="rounded-lg bg-red-50 px-6 py-4 text-red-900" role="alert">
-          Error al cargar los datos: {error.message}
-        </p>
+      <div className="flex min-h-[60vh] items-center justify-center px-4">
+        <div className="rounded-3xl border border-red-100 bg-red-50/70 px-8 py-10 text-center shadow-sm">
+          <p className="text-lg font-semibold text-red-700">No pudimos cargar los datos</p>
+          <p className="mt-2 text-sm text-red-600">{error.message}</p>
+        </div>
       </div>
     );
   }
 
   const branches = (data as Branch[] | null) ?? [];
-
   const uniqueStoresMap = new Map<string, Store>();
   for (const branch of branches) {
     const existing = uniqueStoresMap.get(branch.store_id);
@@ -131,6 +176,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
     .sort((a, b) => (a.distance_km ?? Infinity) - (b.distance_km ?? Infinity))
     .slice(0, 6);
 
+  const userLocation = lat || lon ? { lat, lon } : undefined;
+
   const mapParams = new URLSearchParams();
   if (query) {
     mapParams.set('query', query);
@@ -147,113 +194,49 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
   const mapHref = mapParams.size > 0 ? `/mapa?${mapParams.toString()}` : '/mapa';
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="pb-20">
       <LocationHandler />
-
-      <header className="sticky top-0 z-40 border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur-sm">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="flex items-center gap-2 text-xl font-black text-gray-900 transition-colors hover:text-brand-600">
-            <svg className="h-7 w-7 text-brand-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z" fill="currentColor"/>
-              <path d="M9 12l2 2 4-4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            DescuentosUY
-          </Link>
-          <nav className="flex items-center gap-4">
-            <Link href="#top-promos" className="hidden text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 sm:block">
-              Destacados
-            </Link>
-            <Link href={mapHref} className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-700">
-              Ver mapa
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-              </svg>
-            </Link>
-            <Link href="/admin/cargar" className="hidden text-xs font-medium text-gray-500 transition-colors hover:text-gray-700 md:inline-flex items-center gap-1" title="Panel de administración">
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              Admin
-            </Link>
-          </nav>
-        </div>
-      </header>
-
-      <main className="mx-auto flex w-full max-w-7xl flex-col gap-12 px-4 pb-16 pt-10 sm:px-6 lg:px-8">
-        <HomeHero />
-
-        <section className="-mt-6 sm:-mt-8">
-          <div className="mx-auto max-w-4xl rounded-xl border border-gray-200 bg-white p-4 shadow-lg sm:p-6 lg:p-8">
-            <form method="GET" action="/" className="space-y-3 sm:space-y-4">
-              <div className="flex flex-col gap-3 md:flex-row md:gap-4">
-                <div className="flex-1 space-y-1.5 sm:space-y-2">
-                  <label htmlFor="query" className="text-xs font-medium text-gray-700 sm:text-sm">
-                    Buscar locales o promociones
-                  </label>
-                  <input
-                    id="query"
-                    type="search"
-                    name="query"
-                    defaultValue={query || ''}
-                    placeholder="Ej: hamburguesa, cafe..."
-                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs text-gray-900 transition-colors placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 sm:px-4 sm:py-2.5 sm:text-sm"
-                  />
-                </div>
-                <div className="md:w-44">
-                  <label htmlFor="sort" className="text-xs font-medium text-gray-700 sm:text-sm">
-                    Ordenar por
-                  </label>
-                  <select
-                    id="sort"
-                    name="sort"
-                    defaultValue={sort || 'default'}
-                    className="mt-1.5 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 sm:px-4 sm:py-2.5 sm:text-sm sm:mt-2"
-                  >
-                    <option value="default">Recomendados</option>
-                    <option value="max_discount">Mayor descuento</option>
-                    <option value="distance">Cercanía</option>
-                  </select>
-                </div>
-                <div className="flex items-end">
-                  <button
-                    type="submit"
-                    className="w-full rounded-lg bg-brand-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-brand-700 md:w-auto sm:px-6 sm:py-2.5 sm:text-sm"
-                  >
-                    Buscar
-                  </button>
-                </div>
-              </div>
-              <div className="border-t border-gray-100 pt-3 sm:pt-4">
-                <Suspense fallback={<div className="h-10 bg-gray-50 rounded-lg animate-pulse" />}>
-                  <FilterChips />
-                </Suspense>
-              </div>
-            </form>
-          </div>
+      <div className="container-custom space-y-20 py-8">
+        <section className="space-y-8">
+          <HomeHero />
+          <HomeSearch query={query} sort={sort} />
         </section>
+
+        {topDiscounts.length > 0 && (
+          <section className="space-y-8">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="space-y-2">
+                <div className="inline-block px-3 py-1 rounded-full bg-primary/10 text-xs font-semibold text-primary uppercase tracking-wide">
+                  Radar semanal
+                </div>
+                <h2 className="font-heading font-bold text-3xl text-foreground">
+                  Locales con beneficios recién confirmados
+                </h2>
+              </div>
+              <Link
+                href="/mapa"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-secondary text-foreground font-medium hover:bg-secondary/80 transition-colors"
+              >
+                Ver mapa completo
+                <span aria-hidden className="transition-transform group-hover:translate-x-1">→</span>
+              </Link>
+            </div>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+              {topDiscounts.map((store) => (
+                <StoreCard key={store.id} store={store} />
+              ))}
+            </div>
+          </section>
+        )}
 
         <HomeHighlights topDiscounts={topDiscountStores} nearby={nearbyStores} userLocation={userLocation} />
-
-        <HomeBenefits />
-
         <HomeMapPreview href={mapHref} />
-
-        <section className="space-y-6">
-          <div className="space-y-2">
-            <h2 className="text-3xl font-bold text-gray-900 lg:text-4xl">Todos los locales con beneficios</h2>
-            <p className="text-base text-gray-600">
-              Explorá el listado completo y hacé clic en cualquier local para ver horarios, teléfonos y promociones adicionales.
-            </p>
-          </div>
-          <Suspense fallback={<div className="rounded-xl border border-gray-200 bg-white p-8 text-center text-sm text-gray-500 shadow-sm">Cargando locales...</div>}>
-            <StoreList stores={uniqueStores} query={query} userLocation={userLocation} />
-          </Suspense>
-        </section>
-
+        <HomeBenefits />
         <HomeCTA />
-      </main>
+      </div>
+      <FloatingCTA />
     </div>
   );
 }
+
 

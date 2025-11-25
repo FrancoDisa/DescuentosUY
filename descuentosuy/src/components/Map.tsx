@@ -73,8 +73,7 @@ function ClusterManager({ stores, storeMarkerIcon, userQueryParams, userLat, use
   useEffect(() => {
     if (!map) return;
 
-    // Crear grupo de clustering
-    // @ts-expect-error - markerClusterGroup is added by leaflet.markercluster plugin
+    // Crear grupo de clustering proporcionado por leaflet.markercluster
     const clusterGroup = L.markerClusterGroup({
       maxClusterRadius: 80,
       disableClusteringAtZoom: 17,
@@ -133,54 +132,58 @@ function ClusterManager({ stores, storeMarkerIcon, userQueryParams, userLat, use
         })();
 
         const popupContent = `
-          <div class="w-56 space-y-3">
-            <div class="flex items-start gap-3">
-              <div class="mt-0.5 h-11 w-11 shrink-0 overflow-hidden rounded-md border border-gray-200 bg-white">
-                ${branch.logo_url 
-                  ? `<img src="${branch.logo_url}" alt="${branch.store_name} logo" class="h-full w-full object-contain p-1" />` 
-                  : '<div class="flex h-full w-full items-center justify-center text-[10px] text-gray-400">Sin logo</div>'
-                }
+          <div class="w-64 font-sans">
+            <div class="flex items-start gap-3 mb-3">
+              <div class="h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+                ${branch.logo_url
+            ? `<img src="${branch.logo_url}" alt="${branch.store_name}" class="h-full w-full object-contain p-1" />`
+            : '<div class="flex h-full w-full items-center justify-center bg-gray-50 text-[10px] text-gray-400">Sin logo</div>'
+          }
               </div>
-              <div class="flex-1 space-y-1">
-                <p class="text-sm font-semibold text-gray-900 leading-tight">${branch.store_name}</p>
-                <p class="text-xs text-gray-500 leading-tight">${branch.branch_name}</p>
-                ${addressLabel ? `<p class="text-xs text-gray-400 leading-tight">${addressLabel}</p>` : ''}
-                <div class="flex flex-wrap gap-x-2 gap-y-1 text-xs">
-                  ${distanceLabel ? `<span class="inline-flex items-center gap-1 rounded-full bg-purple-50 px-2 py-0.5 font-medium text-purple-600">📍 ${distanceLabel}</span>` : ''}
-                  ${promoCountLabel ? `<span class="inline-flex items-center rounded-full bg-purple-100 px-2 py-0.5 text-purple-700">${promoCountLabel}</span>` : ''}
-                </div>
+              <div class="flex-1 min-w-0">
+                <h3 class="text-sm font-bold text-gray-900 leading-tight truncate">${branch.store_name}</h3>
+                <p class="text-xs text-gray-500 truncate mt-0.5">${branch.branch_name}</p>
+                ${addressLabel ? `<p class="text-[10px] text-gray-400 truncate mt-0.5">${addressLabel}</p>` : ''}
               </div>
             </div>
-            <div class="rounded-md bg-purple-50 p-3">
-              ${topPromotion 
-                ? `<div class="space-y-1">
-                    <div class="flex items-baseline gap-2">
-                      ${promoValueLabel ? `<span class="text-xl font-extrabold text-purple-700">${promoValueLabel}</span>` : ''}
-                      <span class="text-sm font-semibold text-gray-900 leading-tight">${promoTitleLabel || 'Promocion activa'}</span>
+            
+            <div class="flex flex-wrap gap-1.5 mb-3">
+              ${distanceLabel ? `<span class="inline-flex items-center gap-1 rounded-md bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600 border border-gray-200">📍 ${distanceLabel}</span>` : ''}
+              ${promoCountLabel ? `<span class="inline-flex items-center rounded-md bg-indigo-50 px-1.5 py-0.5 text-[10px] font-medium text-indigo-700 border border-indigo-100">${promoCountLabel}</span>` : ''}
+            </div>
+
+            <div class="rounded-lg bg-slate-50 p-2.5 border border-slate-100 mb-3">
+              ${topPromotion
+            ? `<div class="space-y-1">
+                    <div class="flex items-baseline gap-1.5">
+                      ${promoValueLabel ? `<span class="text-lg font-bold text-indigo-600">${promoValueLabel}</span>` : ''}
+                      <span class="text-xs font-medium text-gray-900 line-clamp-1">${promoTitleLabel || 'Promoción activa'}</span>
                     </div>
-                    ${promoIssuerLabel ? `<p class="text-xs text-purple-700 leading-tight">${promoIssuerLabel}</p>` : ''}
-                    ${promoMetaLabel ? `<p class="text-xs text-purple-500 leading-tight">${promoMetaLabel}</p>` : ''}
+                    ${promoIssuerLabel ? `<p class="text-[10px] text-indigo-600 font-medium">${promoIssuerLabel}</p>` : ''}
+                    ${promoMetaLabel ? `<p class="text-[10px] text-slate-500">${promoMetaLabel}</p>` : ''}
                   </div>`
-                : maxDiscount != null 
-                ? `<p class="text-sm font-semibold text-purple-700 leading-tight">Hasta ${maxDiscount}% de descuento</p>`
-                : '<p class="text-sm text-gray-500 leading-tight">Promocion en proceso de carga.</p>'
-              }
+            : maxDiscount != null
+              ? `<p class="text-sm font-semibold text-indigo-600">Hasta ${maxDiscount}% de descuento</p>`
+              : '<p class="text-xs text-gray-500">Sin promociones activas</p>'
+          }
             </div>
-            <a href="${detailHref}" class="flex items-center justify-between gap-3 rounded-md border border-purple-200 bg-white px-3 py-2 text-sm font-semibold text-purple-700 transition hover:bg-purple-600 hover:text-white">
-              ${ctaLabel}
-              <span>→</span>
-            </a>
-            <a href="${directionsUrl}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-between gap-3 rounded-md border border-gray-200 bg-gray-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-gray-800">
-              Como llegar
-              <svg aria-hidden xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
-                <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.25A1 1 0 009 15.75V11a1 1 0 112 0v4.75a1 1 0 00.725.962l5 1.25a1 1 0 001.169-1.409l-7-14z" />
-              </svg>
-            </a>
+
+            <div class="grid grid-cols-2 gap-2">
+              <a href="${detailHref}" class="flex items-center justify-center gap-1.5 rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-indigo-700 shadow-sm">
+                Ver detalles
+              </a>
+              <a href="${directionsUrl}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-1.5 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900 shadow-sm">
+                Ir ahora
+                <svg aria-hidden xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-3 w-3">
+                  <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.25A1 1 0 009 15.75V11a1 1 0 112 0v4.75a1 1 0 00.725.962l5 1.25a1 1 0 001.169-1.409l-7-14z" />
+                </svg>
+              </a>
+            </div>
           </div>
         `;
 
         const marker = L.marker([branch.latitude, branch.longitude], { icon: storeMarkerIcon });
-        marker.bindPopup(popupContent, { minWidth: 240, maxWidth: 240, offset: [0, -8] });
+        marker.bindPopup(popupContent, { minWidth: 260, maxWidth: 260, offset: [0, -8] });
         clusterGroup.addLayer(marker);
       }
     });
@@ -231,29 +234,10 @@ export function Map({ stores, height }: MapProps) {
         iconSize: [24, 24],
         iconAnchor: [12, 12],
         html: `
-          <span
-            style="
-              display:flex;
-              align-items:center;
-              justify-content:center;
-              width:24px;
-              height:24px;
-              border-radius:9999px;
-              background:rgba(124, 58, 237, 0.9);
-              border:3px solid #ffffff;
-              box-shadow:0 0 6px rgba(124, 58, 237, 0.75);
-            "
-          >
-            <span
-              style="
-                width:8px;
-                height:8px;
-                border-radius:9999px;
-                background:#ffffff;
-                display:block;
-              "
-            ></span>
-          </span>
+          <div class="relative flex h-6 w-6 items-center justify-center">
+            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-indigo-400 opacity-75"></span>
+            <span class="relative inline-flex h-4 w-4 rounded-full bg-indigo-600 border-2 border-white shadow-md"></span>
+          </div>
         `,
       }),
     []
@@ -287,27 +271,27 @@ export function Map({ stores, height }: MapProps) {
   }, []);
 
   return (
-    <div className="relative">
+    <div className="relative h-full w-full">
       <MapContainer
         center={mapCenter}
         zoom={14}
-        style={{ height: mapHeight, width: '100%', borderRadius: '8px' }}
+        style={{ height: mapHeight, width: '100%', zIndex: 0 }}
       >
         <RecenterOnUser userLat={userLat} userLon={userLon} branchPositions={branchPositions} />
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-      
-      {/* Marcador para la ubicación del usuario */}
-      {userLat !== null && userLon !== null && (
-        <Marker position={[userLat, userLon]} icon={userMarkerIcon}>
-          <Popup>Tu ubicación</Popup>
-        </Marker>
-      )}
 
-      {/* Marcadores para cada sucursal */}
-      <ClusterManager stores={stores} storeMarkerIcon={storeMarkerIcon} userQueryParams={userQueryParams} userLat={userLat} userLon={userLon} />
+        {/* Marcador para la ubicación del usuario */}
+        {userLat !== null && userLon !== null && (
+          <Marker position={[userLat, userLon]} icon={userMarkerIcon}>
+            <Popup>Tu ubicación</Popup>
+          </Marker>
+        )}
+
+        {/* Marcadores para cada sucursal */}
+        <ClusterManager stores={stores} storeMarkerIcon={storeMarkerIcon} userQueryParams={userQueryParams} userLat={userLat} userLon={userLon} />
       </MapContainer>
       <LocationStatus />
     </div>

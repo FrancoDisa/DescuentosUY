@@ -11,6 +11,8 @@ const INITIAL_STORE_STATE = {
   logoUrl: '',
 };
 
+type BranchSummary = Pick<Branch, 'id' | 'name' | 'address'>;
+
 type Props = {
   supabase: SupabaseClient;
   stores: Store[];
@@ -20,13 +22,13 @@ type Props = {
 
 export function StoreManager({ supabase, stores, promotions, onDataUpdated }: Props) {
   const [selectedStoreId, setSelectedStoreId] = useState<string>('');
-  const [branches, setBranches] = useState<Branch[]>([]);
+  const [branches, setBranches] = useState<BranchSummary[]>([]);
   const [storePromotions, setStorePromotions] = useState<string[]>([]);
   const [storeForm, setStoreForm] = useState(INITIAL_STORE_STATE);
   const [newStoreForm, setNewStoreForm] = useState(INITIAL_STORE_STATE);
   const [branchName, setBranchName] = useState('');
   const [branchAddress, setBranchAddress] = useState('');
-  const [editingBranch, setEditingBranch] = useState<Branch | null>(null);
+  const [editingBranch, setEditingBranch] = useState<BranchSummary | null>(null);
   const [isEditingStore, setIsEditingStore] = useState(false);
   const [operationLoading, setOperationLoading] = useState(false);
 
@@ -225,7 +227,7 @@ export function StoreManager({ supabase, stores, promotions, onDataUpdated }: Pr
     }
   };
 
-  const handleEditBranch = (branch: Branch) => {
+  const handleEditBranch = (branch: BranchSummary) => {
     setEditingBranch(branch);
     setBranchName(branch.name);
     setBranchAddress(branch.address);
@@ -270,7 +272,7 @@ export function StoreManager({ supabase, stores, promotions, onDataUpdated }: Pr
             }
             maxLength={100}
             placeholder="Nombre del local *"
-            className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
             aria-label="Nombre del nuevo local"
           />
           <input
@@ -281,7 +283,7 @@ export function StoreManager({ supabase, stores, promotions, onDataUpdated }: Pr
             }
             maxLength={500}
             placeholder="URL del logo (opcional)"
-            className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
             aria-label="URL del logo"
           />
           <button
@@ -307,7 +309,7 @@ export function StoreManager({ supabase, stores, promotions, onDataUpdated }: Pr
             setBranchName('');
             setBranchAddress('');
           }}
-          className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-500"
           aria-label="Seleccionar local"
         >
           <option value="">-- Selecciona un local --</option>
@@ -353,7 +355,7 @@ export function StoreManager({ supabase, stores, promotions, onDataUpdated }: Pr
                 }
                 maxLength={100}
                 placeholder="Nombre del local"
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
                 aria-label="Nombre del local"
               />
               <input
@@ -364,7 +366,7 @@ export function StoreManager({ supabase, stores, promotions, onDataUpdated }: Pr
                 }
                 maxLength={500}
                 placeholder="URL del logo"
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
                 aria-label="URL del logo"
               />
               <button
@@ -419,7 +421,7 @@ export function StoreManager({ supabase, stores, promotions, onDataUpdated }: Pr
               onChange={(e) => setBranchName(e.target.value.slice(0, 100))}
               maxLength={100}
               placeholder="Nombre de la sucursal *"
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
               aria-label="Nombre de la sucursal"
             />
             <input
@@ -428,7 +430,7 @@ export function StoreManager({ supabase, stores, promotions, onDataUpdated }: Pr
               onChange={(e) => setBranchAddress(e.target.value.slice(0, 200))}
               maxLength={200}
               placeholder="Dirección *"
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
               aria-label="Dirección de la sucursal"
             />
             <div className="flex gap-2">

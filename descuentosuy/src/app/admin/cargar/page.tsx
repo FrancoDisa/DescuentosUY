@@ -78,10 +78,10 @@ export default function AdminPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-100 p-4 md:p-8">
-      <div className="mx-auto max-w-7xl">
+    <main className="pb-16">
+      <div className="mx-auto max-w-6xl space-y-8 px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="flex flex-col gap-4 rounded-3xl border border-neutral-100 bg-white/80 p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-4xl font-bold text-gray-900">Panel de Administración</h1>
             <p className="mt-2 text-gray-700">Gestiona locales, sucursales y promociones</p>
@@ -90,14 +90,14 @@ export default function AdminPage() {
             <button
               onClick={handleUpdateAllBranchDetails}
               disabled={detailsLoading}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:bg-gray-400"
+              className="button button--primary disabled:opacity-60"
               aria-label="Actualizar detalles pendientes de sucursales"
             >
               {detailsLoading ? 'Actualizando Detalles...' : 'Actualizar Detalles Pendientes'}
             </button>
             <Link
               href="/"
-              className="rounded-lg bg-brand-600 px-4 py-2 font-semibold text-white transition hover:bg-brand-700"
+              className="rounded-full border border-neutral-200 px-4 py-2 text-sm font-semibold text-neutral-700 hover:border-neutral-300"
               aria-label="Volver a la página principal"
             >
               ← Volver al Home
@@ -106,14 +106,14 @@ export default function AdminPage() {
         </div>
 
         {/* Tabs */}
-        <div className="mb-6 border-b border-gray-200">
-          <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+        <div className="space-y-4">
+          <nav className="flex flex-wrap gap-3" aria-label="Tabs">
             <button
               onClick={() => setActiveTab('promotions')}
               className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium ${
                 activeTab === 'promotions'
-                  ? 'border-brand-600 text-brand-600'
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                  ? 'bg-brand-900 text-white shadow-sm'
+                  : 'border border-neutral-200 bg-white/80 text-neutral-600 hover:text-brand-900'
               }`}
               aria-current={activeTab === 'promotions' ? 'page' : undefined}
               aria-label="Gestionar promociones"
@@ -124,8 +124,8 @@ export default function AdminPage() {
               onClick={() => setActiveTab('stores')}
               className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium ${
                 activeTab === 'stores'
-                  ? 'border-brand-600 text-brand-600'
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                  ? 'bg-brand-900 text-white shadow-sm'
+                  : 'border border-neutral-200 bg-white/80 text-neutral-600 hover:text-brand-900'
               }`}
               aria-current={activeTab === 'stores' ? 'page' : undefined}
               aria-label="Asociar promociones a locales"
@@ -136,8 +136,8 @@ export default function AdminPage() {
               onClick={() => setActiveTab('bulk')}
               className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium ${
                 activeTab === 'bulk'
-                  ? 'border-brand-600 text-brand-600'
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                  ? 'bg-brand-900 text-white shadow-sm'
+                  : 'border border-neutral-200 bg-white/80 text-neutral-600 hover:text-brand-900'
               }`}
               aria-current={activeTab === 'bulk' ? 'page' : undefined}
               aria-label="Importación masiva de sucursales"
@@ -148,7 +148,7 @@ export default function AdminPage() {
         </div>
 
         {/* Tab Content */}
-        <div className="rounded-lg bg-white p-6 shadow-sm">
+        <div className="rounded-3xl border border-neutral-100 bg-white/80 p-6 shadow-sm">
           {activeTab === 'promotions' && (
             <PromotionManager
               supabase={supabase}

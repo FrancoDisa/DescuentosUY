@@ -128,7 +128,7 @@ export function PromotionManager({ supabase, promotions, onPromotionsUpdated }: 
             onChange={(e) => setPromoForm({ ...promoForm, name: e.target.value.slice(0, 100) })}
             maxLength={100}
             placeholder="Nombre *"
-            className="rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
             aria-label="Nombre de la promoción"
           />
           <input
@@ -137,7 +137,7 @@ export function PromotionManager({ supabase, promotions, onPromotionsUpdated }: 
             onChange={(e) => setPromoForm({ ...promoForm, issuer: e.target.value.slice(0, 50) })}
             maxLength={50}
             placeholder="Emisor (ej: BROU, Santander) *"
-            className="rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
             aria-label="Emisor de la tarjeta"
           />
           <input
@@ -147,7 +147,7 @@ export function PromotionManager({ supabase, promotions, onPromotionsUpdated }: 
             placeholder="Descuento (%) *"
             min="0"
             max="100"
-            className="rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
             aria-label="Porcentaje de descuento"
           />
           <input
@@ -156,7 +156,7 @@ export function PromotionManager({ supabase, promotions, onPromotionsUpdated }: 
             onChange={(e) => setPromoForm({ ...promoForm, cardType: e.target.value.slice(0, 50) })}
             maxLength={50}
             placeholder="Tipo (Débito/Crédito)"
-            className="rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
             aria-label="Tipo de tarjeta"
           />
           <input
@@ -165,7 +165,7 @@ export function PromotionManager({ supabase, promotions, onPromotionsUpdated }: 
             onChange={(e) => setPromoForm({ ...promoForm, cardTier: e.target.value.slice(0, 50) })}
             maxLength={50}
             placeholder="Nivel (Classic/Gold/Platinum)"
-            className="rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
             aria-label="Nivel de la tarjeta"
           />
         </div>
@@ -175,7 +175,7 @@ export function PromotionManager({ supabase, promotions, onPromotionsUpdated }: 
           maxLength={500}
           placeholder="Descripción (opcional)"
           rows={3}
-          className="mt-4 w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="mt-4 w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
           aria-label="Descripción de la promoción"
         />
         <div className="mt-4 flex gap-2">
