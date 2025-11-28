@@ -10,7 +10,7 @@ dotenv.config({ path: './.env.local' });
 
 const client = new Client({});
 
-const branchesFilePath = '../branches.csv';
+const branchesFilePath = './data/branches.csv';
 const results = [];
 
 // Función para introducir una pausa
